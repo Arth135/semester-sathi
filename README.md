@@ -4,10 +4,10 @@ Semester Sathi is an offline-first semester planner for Android and modern deskt
 
 ## Download and try it
 
-- Android APK (version 0.1.4): [downloads/Semester-Sathi-0.1.4-debug.apk](downloads/Semester-Sathi-0.1.4-debug.apk)
+- Android APK (version 0.1.5): [download the debug APK](https://github.com/Arth135/semester-sathi/releases/download/v0.1.5/Semester-Sathi-0.1.5-debug.apk)
 - All versioned APK releases: [GitHub Releases](https://github.com/Arth135/semester-sathi/releases)
-- Android source project: [downloads/semester-sathi-android-source.zip](downloads/semester-sathi-android-source.zip)
-- Browser demo: open [demo/index.html](demo/index.html), or download [downloads/semester-sathi-demo.zip](downloads/semester-sathi-demo.zip)
+- Android source project: [download the Android source archive](https://github.com/Arth135/semester-sathi/releases/download/v0.1.5/semester-sathi-android-source.zip)
+- Browser demo: open [demo/index.html](demo/index.html), or [download the demo archive](https://github.com/Arth135/semester-sathi/releases/download/v0.1.5/semester-sathi-demo.zip)
 
 The APK is a debug build for personal testing. Copy it to your phone, open it, and allow installation from that file manager if Android asks. Allow notifications if you want task reminders. If updating from an earlier version, the first launch migrates existing semester data and any API key still available in the prior app session. A key saved in the app is stored securely for later launches.
 
@@ -19,6 +19,7 @@ The APK is a debug build for personal testing. Copy it to your phone, open it, a
 - Topic statuses: Not started, In progress, and Done; progress bars calculate from topics marked Done.
 - Study tasks, offline study-plan generator, and local JSON backup and restore.
 - Optional Gemini AI Chat and AI study-plan generation.
+- A local Files library for exam timetables, e-books, PDFs, Office/OpenDocument files, text, and images. Attach compatible files in AI Chat so Gemini can read dates and help draft a plan.
 - Gemini connection check with Google key, quota, and request error details; temporary network/server errors are retried once.
 - Light and dark themes.
 - Android local reminders scheduled on-device and restored after a phone restart.
@@ -26,10 +27,10 @@ The APK is a debug build for personal testing. Copy it to your phone, open it, a
 ## Gemini setup
 
 1. Create your own Gemini API key in [Google AI Studio](https://aistudio.google.com/apikey).
-2. In Semester Sathi, open Data & settings, paste the key, and save it on this device.
+2. In Semester Sathi, tap the profile icon, open Data & settings, paste the key, and save it on this device.
 3. Choose AI Chat to chat, or Build study plan to request a plan. Use Test connection in settings if requests fail.
 
-Gemini requests go directly from the app to Google; there is no backend server. The key is not embedded in this repository or APK and is not included in backups. Android encrypts it with Android Keystore for reuse between app launches; the browser demo saves it in that browser. Use Clear in Settings to remove it. Chat sends the prompt and relevant study context (subjects, exam dates, topic statuses, and task details); profile name and college fields are excluded. AI can propose adding or removing subjects and tasks, adding chapters or lessons, and changing topic status. A subject needs only a name; exam details and topics are optional and can be edited later. Review every proposed change and choose Apply changes before the app changes local data.
+Gemini requests go directly from the app to Google; there is no backend server. The key is not embedded in this repository or APK and is not included in backups. Android encrypts it with Android Keystore for reuse between app launches; the browser demo saves it in that browser. Use Clear in Data & settings to remove it. Chat sends the prompt and relevant study context (subjects, exam dates, topic statuses, and task details); profile name and college fields are excluded. A document is sent only when you attach it and send a chat message. Local copies stay in the Files library on the device. Large files use Google's temporary Files API storage; Google says those uploads are deleted after 48 hours. EPUB files can be saved locally but must be converted to PDF before Gemini can read them. AI can propose adding or removing subjects and tasks, updating exam details from a timetable, adding chapters or lessons, and changing topic status. A subject needs only a name; exam details and topics are optional and can be edited later. Review every proposed change and choose Apply changes before the app changes local data.
 
 Gemini requires internet. Model availability, free-tier eligibility, limits, and pricing are set by Google and may change. See Google's current [Gemini API pricing and terms](https://ai.google.dev/gemini-api/docs/pricing/). A 429 response usually means a project quota or rate limit was reached; wait for the quota window or review the Google AI Studio project limits.
 
