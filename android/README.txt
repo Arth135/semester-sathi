@@ -10,7 +10,7 @@ Features
 - Test connection in Data & settings reports key, quota, or request errors. Temporary network/server failures are retried once.
 - Local task reminders, restored after a phone restart. Android 13+ asks for notification permission.
 - HTTPS-style local WebView origin for reliable cross-origin Gemini requests. No app screen is hosted remotely.
-- On first launch after upgrading from 0.1.0, existing semester data and the active session API key are migrated to the new app origin.
+- On first launch after upgrading from 0.1.0 or 0.1.1, existing semester data and any still-available session API key are migrated. The Android app encrypts the key for reuse between launches.
 
 Build
 1. Install JDK 17 or newer.
@@ -22,6 +22,6 @@ Install
 Copy the debug APK to an Android phone and open it. Allow installation from the file manager if Android asks. Android creates a local debug signing key on the first build. This debug APK is for personal testing, not public release.
 
 Gemini and privacy
-The API key belongs to each user and is not embedded in the APK or exported in backups. Gemini sends the prompt and relevant study data to Google only when an AI feature is used. The app itself has no account or sync server. Google quota and free-tier policies are controlled by Google.
+The API key belongs to each user and is not embedded in the APK or exported in backups. It is encrypted with Android Keystore on the phone and persists until cleared in Settings. Gemini sends the prompt and relevant study data to Google only when an AI feature is used. The app itself has no account or sync server. Google quota and free-tier policies are controlled by Google.
 
 Reminders use Android's inexact alarms, so the operating system may delay a notification while the device is idle or saving battery.

@@ -7,6 +7,9 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
+import android.util.Base64;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -22,11 +25,18 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 
 public class MainActivity extends Activity {
     private static final int POST_NOTIFICATIONS_REQUEST = 801;
@@ -35,6 +45,9 @@ public class MainActivity extends Activity {
     private static final String MIGRATION_PREFS = "semester_sathi_webview_migration";
     private static final String MIGRATED_STATE_KEY = "legacy_state";
     private static final String MIGRATION_DONE_KEY = "https_origin_migration_done";
+    private static final String API_KEY_PREFS = "semester_sathi_secure_settings";
+    private static final String API_KEY_VALUE = "encrypted_gemini_api_key";
+    private static final String API_KEY_ALIAS = "semester_sathi_gemini_api_key";
 
     private final ArrayList<ReminderRequest> waitingForPermission = new ArrayList<>();
     private boolean permissionRequestInFlight = false;
@@ -151,6 +164,68 @@ public class MainActivity extends Activity {
         return payload.toString();
     }
 
+    private SecretKey getOrCreateApiKeySecret() throws Exception {
+        KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+        keyStore.load(null);
+        if (keyStore.containsAlias(API_KEY_ALIAS)) {
+            return (SecretKey) keyStore.getKey(API_KEY_ALIAS, null);
+        }
+        KeyGenerator generator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
+        generator.init(new KeyGenParameterSpec.Builder(API_KEY_ALIAS,
+                KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setRandomizedEncryptionRequired(true)
+                .setKeySize(256)
+                .build());
+        return generator.generateKey();
+    }
+
+    private String readSavedGeminiApiKey() {
+        String encrypted = getSharedPreferences(API_KEY_PREFS, MODE_PRIVATE).getString(API_KEY_VALUE, "");
+        if (encrypted.isEmpty()) return "";
+        try {
+            byte[] packed = Base64.decode(encrypted, Base64.NO_WRAP);
+            if (packed.length <= 12) throw new IllegalArgumentException("Invalid encrypted key.");
+            byte[] iv = Arrays.copyOfRange(packed, 0, 12);
+            byte[] ciphertext = Arrays.copyOfRange(packed, 12, packed.length);
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, getOrCreateApiKeySecret(), new GCMParameterSpec(128, iv));
+            return new String(cipher.doFinal(ciphertext), StandardCharsets.UTF_8);
+        } catch (Exception exception) {
+            getSharedPreferences(API_KEY_PREFS, MODE_PRIVATE).edit().remove(API_KEY_VALUE).apply();
+            return "";
+        }
+    }
+
+    private String saveGeminiApiKey(String apiKey) {
+        if (apiKey == null || apiKey.trim().isEmpty()) return "error";
+        try {
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.ENCRYPT_MODE, getOrCreateApiKeySecret());
+            byte[] iv = cipher.getIV();
+            byte[] ciphertext = cipher.doFinal(apiKey.trim().getBytes(StandardCharsets.UTF_8));
+            byte[] packed = new byte[iv.length + ciphertext.length];
+            System.arraycopy(iv, 0, packed, 0, iv.length);
+            System.arraycopy(ciphertext, 0, packed, iv.length, ciphertext.length);
+            String encoded = Base64.encodeToString(packed, Base64.NO_WRAP);
+            boolean saved = getSharedPreferences(API_KEY_PREFS, MODE_PRIVATE).edit()
+                    .putString(API_KEY_VALUE, encoded).commit();
+            return saved ? "saved" : "error";
+        } catch (Exception exception) {
+            return "error";
+        }
+    }
+
+    private void clearSavedGeminiApiKey() {
+        getSharedPreferences(API_KEY_PREFS, MODE_PRIVATE).edit().remove(API_KEY_VALUE).commit();
+        try {
+            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null);
+            if (keyStore.containsAlias(API_KEY_ALIAS)) keyStore.deleteEntry(API_KEY_ALIAS);
+        } catch (Exception ignored) { }
+    }
+
     private static final class ReminderRequest {
         final String id;
         final String title;
@@ -174,6 +249,21 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public String consumeMigratedData() {
             return consumeMigrationPayload();
+        }
+
+        @JavascriptInterface
+        public String getSavedGeminiApiKey() {
+            return readSavedGeminiApiKey();
+        }
+
+        @JavascriptInterface
+        public String saveGeminiApiKey(String apiKey) {
+            return MainActivity.this.saveGeminiApiKey(apiKey);
+        }
+
+        @JavascriptInterface
+        public void clearSavedGeminiApiKey() {
+            MainActivity.this.clearSavedGeminiApiKey();
         }
 
         @JavascriptInterface

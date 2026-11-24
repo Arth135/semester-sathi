@@ -464,6 +464,7 @@
     (function () {
       "use strict";
       var STORAGE_KEY = "semester-sathi-demo-v1";
+      var API_KEY_STORAGE_KEY = "semester-sathi-gemini-key-v1";
       var COLORS = { physics: "#4779a0", chemistry: "#438663", mathematics: "#c47e36", biology: "#8b6bb0" };
       var pageNames = {
         overview: ["Overview", "Your semester at a glance"],
@@ -564,19 +565,46 @@
       }
       restoreAndroidMigration();
       var state = loadState();
-      function readSessionApiKey() {
-        try { return sessionStorage.getItem("semester-sathi-gemini-key") || ""; }
-        catch (e) { return ""; }
+      function persistGeminiApiKey(key) {
+        if (window.Android && typeof window.Android.saveGeminiApiKey === "function") {
+          try { return window.Android.saveGeminiApiKey(key) === "saved"; }
+          catch (e) { return false; }
+        }
+        try { localStorage.setItem(API_KEY_STORAGE_KEY, key); return true; }
+        catch (e) { return false; }
       }
-      var apiKey = readSessionApiKey();
+      function readSavedGeminiApiKey() {
+        if (window.Android && typeof window.Android.getSavedGeminiApiKey === "function") {
+          try { var deviceKey = window.Android.getSavedGeminiApiKey(); if (deviceKey) return deviceKey; }
+          catch (e) { }
+        }
+        try { var browserKey = localStorage.getItem(API_KEY_STORAGE_KEY) || ""; if (browserKey) return browserKey; }
+        catch (e) { }
+        try {
+          var legacyKey = sessionStorage.getItem("semester-sathi-gemini-key") || "";
+          if (legacyKey) {
+            if (persistGeminiApiKey(legacyKey)) sessionStorage.removeItem("semester-sathi-gemini-key");
+            return legacyKey;
+          }
+        } catch (e) { }
+        return "";
+      }
+      function clearSavedGeminiApiKey() {
+        if (window.Android && typeof window.Android.clearSavedGeminiApiKey === "function") {
+          try { window.Android.clearSavedGeminiApiKey(); } catch (e) { }
+        }
+        try { localStorage.removeItem(API_KEY_STORAGE_KEY); } catch (e) { }
+        try { sessionStorage.removeItem("semester-sathi-gemini-key"); } catch (e) { }
+      }
+      var apiKey = readSavedGeminiApiKey();
       var chatLoading = false;
       function refreshApiStatus() {
         var footer = document.getElementById("api-footer-status");
-        if (footer) footer.textContent = apiKey ? "Gemini key saved for this session · AI needs internet" : "Offline planner ready · Gemini optional";
+        if (footer) footer.textContent = apiKey ? "Gemini key saved on this device · AI needs internet" : "Offline planner ready · Gemini optional";
         var badge = document.getElementById("gemini-status-badge");
         if (badge) {
           badge.className = "api-status" + (apiKey ? " is-ready" : "");
-          badge.innerHTML = '<span class="api-status-dot" aria-hidden="true"></span>' + (apiKey ? "Key saved for this session" : "No key saved");
+          badge.innerHTML = '<span class="api-status-dot" aria-hidden="true"></span>' + (apiKey ? "Key saved on this device" : "No key saved");
         }
       }
       function saveState() {
@@ -774,7 +802,7 @@
         var profileSummary = [profile.institutionType, profile.institutionName, profile.course, profile.yearLevel, profile.semester].filter(Boolean).join(" · ") || "Add your course and year details";
         var top = pageHeading("Data & settings", "Your study workspace is local by default. Gemini is an optional online planner.", "");
         var readyClass = apiKey ? " is-ready" : "";
-        var keyCard = '<section class="settings-card"><div class="panel-head"><div><h2>Gemini AI chat & planner</h2><p class="panel-subtitle">Optional · uses Google Gemini 3.5 Flash-Lite</p></div><span id="gemini-status-badge" class="api-status' + readyClass + '"><span class="api-status-dot" aria-hidden="true"></span>' + (apiKey ? "Key saved for this session" : "No key saved") + '</span></div><p>Get a key from <a class="api-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>, then save it here. This model currently has a free tier, with request limits and project eligibility set by Google. After saving, open the AI Chat tab in the main navigation.</p><div class="api-key-row"><div class="field"><label for="gemini-api-key">Your Gemini API key</label><input id="gemini-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your personal API key here" aria-describedby="gemini-key-note"></div><button class="button button-primary" type="button" data-action="save-api-key">Save for this session</button>' + (apiKey ? '<button class="button" type="button" data-action="test-api">Test connection</button><button class="button" type="button" data-action="clear-api-key">Clear</button>' : '') + '</div><p id="gemini-key-note" class="field-help">The key is kept in session storage for this app or browser session, not in your semester backup. Close the app or browser tab to clear it.</p><div class="api-disclosure">Chat sends your message plus subjects, exam dates, topic statuses, and upcoming open tasks to Google. The app excludes your name and college. Free-tier prompts may be used by Google to improve its products. Use a project with billing disabled if you want to avoid accidental paid API usage, and check your project’s quota. Gemini needs internet; the offline planner remains available.</div></section>';
+        var keyCard = '<section class="settings-card"><div class="panel-head"><div><h2>Gemini AI chat & planner</h2><p class="panel-subtitle">Optional · uses Google Gemini 3.5 Flash-Lite</p></div><span id="gemini-status-badge" class="api-status' + readyClass + '"><span class="api-status-dot" aria-hidden="true"></span>' + (apiKey ? "Key saved on this device" : "No key saved") + '</span></div><p>Get a key from <a class="api-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>, then save it here. This model currently has a free tier, with request limits and project eligibility set by Google. After saving, open the AI Chat tab in the main navigation.</p><div class="api-key-row"><div class="field"><label for="gemini-api-key">Your Gemini API key</label><input id="gemini-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your personal API key here" aria-describedby="gemini-key-note"></div><button class="button button-primary" type="button" data-action="save-api-key">Save on this device</button>' + (apiKey ? '<button class="button" type="button" data-action="test-api">Test connection</button><button class="button" type="button" data-action="clear-api-key">Clear</button>' : '') + '</div><p id="gemini-key-note" class="field-help">The key stays on this device between launches. The Android app encrypts it with Android Keystore; the browser demo saves it in this browser. It is not included in your semester backup or synced. Use Clear to remove it.</p><div class="api-disclosure">Chat sends your message plus subjects, exam dates, topic statuses, and upcoming open tasks to Google. The app excludes your name and college. Free-tier prompts may be used by Google to improve its products. Use a project with billing disabled if you want to avoid accidental paid API usage, and check your project’s quota. Gemini needs internet; the offline planner remains available.</div></section>';
         var appearanceCard = '<section class="settings-card"><h2>Appearance</h2><p>Choose the theme that is easier to read. Your choice is saved on this device.</p><div class="settings-actions"><button class="button button-primary" type="button" data-action="toggle-theme">Switch to ' + (state.theme === "dark" ? "light" : "dark") + ' mode</button><span class="field-help" style="align-self:center">Current: ' + (state.theme === "dark" ? "Dark" : "Light") + '</span></div></section>';
         return top + '<div class="settings-grid"><section class="settings-card"><h2>Student profile</h2><p>' + esc(profile.displayName ? profile.displayName + " · " : "") + esc(profileSummary) + '</p><div class="settings-actions"><button class="button" type="button" data-action="edit-profile">Edit profile</button></div></section>' + appearanceCard + keyCard + '<section class="settings-card"><h2>Local demo data</h2><p>Your profile, subjects, tasks, and progress are saved in this browser. They are not synced to another device. Export a JSON backup if you want to move your semester data.</p><div class="settings-actions"><button class="button button-primary" type="button" data-action="export">Export backup</button><button class="button" type="button" data-action="import">Import backup</button><input id="import-file" type="file" accept="application/json,.json" class="hidden"></div></section><section class="settings-card"><h2>Reset sample workspace</h2><p>Restore the sample subjects, exam dates, and tasks while keeping your student profile.</p><div class="settings-actions"><button class="button" type="button" data-action="reset">Restore sample data</button></div></section></div><div class="demo-note"><strong>Privacy</strong><span>AI Chat sends your message and study context only when you send it; the study planner sends selected subject details after you accept its notice. Your name and college details are excluded. Gemini requests need internet. All other study data stays on this device by default.</span></div>';
       }
@@ -1384,15 +1412,20 @@
           var enteredKey = document.getElementById("gemini-api-key").value.trim();
           if (!enteredKey) { showToast("Paste your Gemini API key first."); return; }
           apiKey = enteredKey;
-          try { sessionStorage.setItem("semester-sathi-gemini-key", apiKey); } catch (e) { }
+          var savedPermanently = persistGeminiApiKey(apiKey);
+          if (!savedPermanently) {
+            try { sessionStorage.setItem("semester-sathi-gemini-key", apiKey); } catch (e) { }
+          } else {
+            try { sessionStorage.removeItem("semester-sathi-gemini-key"); } catch (e) { }
+          }
           render();
-          showToast("Gemini key saved for this session.");
+          showToast(savedPermanently ? "Gemini key saved on this device." : "Key works for this session, but could not be saved permanently.");
         }
         else if (name === "clear-api-key") {
           apiKey = "";
-          try { sessionStorage.removeItem("semester-sathi-gemini-key"); } catch (e) { }
+          clearSavedGeminiApiKey();
           render();
-          showToast("Gemini key cleared from this session.");
+          showToast("Gemini key cleared from this device.");
         }
         else if (name === "add-task") openTaskModal(action.dataset.date);
         else if (name === "add-subject") openSubjectModal();
