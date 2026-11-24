@@ -4,10 +4,10 @@ Semester Sathi is an offline-first semester planner for Android and modern deskt
 
 ## Download and try it
 
-- Android APK (version 0.1.5): [download the debug APK](https://github.com/Arth135/semester-sathi/releases/download/v0.1.5/Semester-Sathi-0.1.5-debug.apk)
+- Android APK (version 0.1.5): [downloads/Semester-Sathi-0.1.5-debug.apk](downloads/Semester-Sathi-0.1.5-debug.apk)
 - All versioned APK releases: [GitHub Releases](https://github.com/Arth135/semester-sathi/releases)
-- Android source project: [download the Android source archive](https://github.com/Arth135/semester-sathi/releases/download/v0.1.5/semester-sathi-android-source.zip)
-- Browser demo: open [demo/index.html](demo/index.html), or [download the demo archive](https://github.com/Arth135/semester-sathi/releases/download/v0.1.5/semester-sathi-demo.zip)
+- Android source project: [downloads/semester-sathi-android-source.zip](downloads/semester-sathi-android-source.zip)
+- Browser demo: open [demo/index.html](demo/index.html), or download [downloads/semester-sathi-demo.zip](downloads/semester-sathi-demo.zip)
 
 The APK is a debug build for personal testing. Copy it to your phone, open it, and allow installation from that file manager if Android asks. Allow notifications if you want task reminders. If updating from an earlier version, the first launch migrates existing semester data and any API key still available in the prior app session. A key saved in the app is stored securely for later launches.
 
