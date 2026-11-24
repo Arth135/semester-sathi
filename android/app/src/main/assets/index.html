@@ -228,13 +228,13 @@
     .settings-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
     .demo-note { display: flex; align-items: flex-start; gap: 11px; margin-top: 18px; padding: 14px 16px; border-radius: 14px; background: #f0f5f1; color: #53645a; font-size: 13px; line-height: 1.5; }
     .demo-note strong { color: #2c5340; }
-    .chat-shell { display: grid; grid-template-rows: minmax(280px,1fr) auto; min-height: min(68vh,720px); overflow: hidden; padding: 0; }
-    .chat-feed { display: flex; flex-direction: column; gap: 14px; overflow-y: auto; padding: 22px; }
+    .chat-shell { display: grid; grid-template-rows: minmax(0,1fr) auto; width: 100%; min-width: 0; height: min(68vh,720px); height: min(68dvh,720px); min-height: 360px; max-height: calc(100dvh - 220px); overflow: hidden; padding: 0; }
+    .chat-feed { display: flex; flex-direction: column; gap: 14px; min-width: 0; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; overflow-anchor: none; padding: 22px; }
     .chat-empty { display: grid; flex: 1; place-content: center; text-align: center; padding: 28px; }
     .chat-empty-mark { display: grid; width: 46px; height: 46px; place-items: center; margin: 0 auto 12px; border-radius: 15px; background: var(--green-soft); color: var(--green-dark); font-size: 22px; }
     .chat-empty h2 { margin: 0; font-size: 18px; }
     .chat-empty p { max-width: 440px; margin: 7px auto 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
-    .chat-message { max-width: min(84%,720px); padding: 13px 15px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface-soft); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55; }
+    .chat-message { box-sizing: border-box; max-width: min(84%,720px); min-width: 0; padding: 13px 15px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface-soft); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55; }
     .chat-message.user { align-self: flex-end; border-color: transparent; border-bottom-right-radius: 5px; background: var(--green); color: white; }
     .chat-message.assistant { align-self: flex-start; border-bottom-left-radius: 5px; }
     .chat-message-label { margin-bottom: 5px; color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .06em; text-transform: uppercase; }
@@ -246,7 +246,7 @@
     .chat-pending-actions { display: flex; flex-wrap: wrap; gap: 8px; }
     .chat-compose { padding: 16px 20px; border-top: 1px solid var(--line); background: var(--surface); }
     .chat-compose-row { display: flex; align-items: flex-end; gap: 10px; }
-    .chat-compose-row textarea { flex: 1; min-height: 50px; max-height: 150px; resize: vertical; padding: 12px 13px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface-soft); color: var(--ink); font: inherit; line-height: 1.45; }
+    .chat-compose-row textarea { box-sizing: border-box; flex: 1; min-width: 0; min-height: 50px; max-height: 150px; resize: vertical; padding: 12px 13px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface-soft); color: var(--ink); font: inherit; line-height: 1.45; }
     .chat-compose-row .button { min-height: 48px; }
     .chat-compose-note { display: flex; justify-content: space-between; gap: 10px; margin-top: 9px; color: var(--muted); font-size: 11px; line-height: 1.4; }
     .chat-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
@@ -405,7 +405,7 @@
       .onboarding-card { border-radius: 0; border-left: 0; border-right: 0; }
       .onboarding-points { grid-template-columns: minmax(0,1fr); }
       .api-key-row { align-items: stretch; flex-direction: column; }
-      .chat-shell { min-height: 62vh; }
+      .chat-shell { height: min(62vh, calc(100vh - 250px)); height: min(62dvh, calc(100dvh - 250px)); min-height: 240px; max-height: calc(100dvh - 210px); }
       .chat-feed { padding: 15px; }
       .chat-message { max-width: 94%; }
       .chat-compose { padding: 12px; }
@@ -552,6 +552,17 @@
           return parsed;
         } catch (e) { return sampleState(); }
       }
+      function restoreAndroidMigration() {
+        if (!window.Android || typeof window.Android.consumeMigratedData !== "function") return;
+        try {
+          var payloadText = window.Android.consumeMigratedData();
+          if (!payloadText) return;
+          var payload = JSON.parse(payloadText);
+          if (payload.state && !localStorage.getItem(STORAGE_KEY)) localStorage.setItem(STORAGE_KEY, payload.state);
+          if (payload.apiKey) sessionStorage.setItem("semester-sathi-gemini-key", payload.apiKey);
+        } catch (e) { }
+      }
+      restoreAndroidMigration();
       var state = loadState();
       function readSessionApiKey() {
         try { return sessionStorage.getItem("semester-sathi-gemini-key") || ""; }
@@ -763,7 +774,7 @@
         var profileSummary = [profile.institutionType, profile.institutionName, profile.course, profile.yearLevel, profile.semester].filter(Boolean).join(" · ") || "Add your course and year details";
         var top = pageHeading("Data & settings", "Your study workspace is local by default. Gemini is an optional online planner.", "");
         var readyClass = apiKey ? " is-ready" : "";
-        var keyCard = '<section class="settings-card"><div class="panel-head"><div><h2>Gemini AI chat & planner</h2><p class="panel-subtitle">Optional · uses Google Gemini 3.5 Flash-Lite</p></div><span id="gemini-status-badge" class="api-status' + readyClass + '"><span class="api-status-dot" aria-hidden="true"></span>' + (apiKey ? "Key saved for this session" : "No key saved") + '</span></div><p>Get a key from <a class="api-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>, then save it here. This model currently has a free tier, with request limits and project eligibility set by Google. After saving, open the AI Chat tab in the main navigation.</p><div class="api-key-row"><div class="field"><label for="gemini-api-key">Your Gemini API key</label><input id="gemini-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your personal API key here" aria-describedby="gemini-key-note"></div><button class="button button-primary" type="button" data-action="save-api-key">Save for this session</button>' + (apiKey ? '<button class="button" type="button" data-action="clear-api-key">Clear</button>' : '') + '</div><p id="gemini-key-note" class="field-help">The key is kept in session storage for this app or browser session, not in your semester backup. Close the app or browser tab to clear it.</p><div class="api-disclosure">Chat sends your message plus subjects, exam dates, topic statuses, and upcoming open tasks to Google. The app excludes your name and college. Free-tier prompts may be used by Google to improve its products. Use a project with billing disabled if you want to avoid accidental paid API usage, and check your project’s quota. Gemini needs internet; the offline planner remains available.</div></section>';
+        var keyCard = '<section class="settings-card"><div class="panel-head"><div><h2>Gemini AI chat & planner</h2><p class="panel-subtitle">Optional · uses Google Gemini 3.5 Flash-Lite</p></div><span id="gemini-status-badge" class="api-status' + readyClass + '"><span class="api-status-dot" aria-hidden="true"></span>' + (apiKey ? "Key saved for this session" : "No key saved") + '</span></div><p>Get a key from <a class="api-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>, then save it here. This model currently has a free tier, with request limits and project eligibility set by Google. After saving, open the AI Chat tab in the main navigation.</p><div class="api-key-row"><div class="field"><label for="gemini-api-key">Your Gemini API key</label><input id="gemini-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your personal API key here" aria-describedby="gemini-key-note"></div><button class="button button-primary" type="button" data-action="save-api-key">Save for this session</button>' + (apiKey ? '<button class="button" type="button" data-action="test-api">Test connection</button><button class="button" type="button" data-action="clear-api-key">Clear</button>' : '') + '</div><p id="gemini-key-note" class="field-help">The key is kept in session storage for this app or browser session, not in your semester backup. Close the app or browser tab to clear it.</p><div class="api-disclosure">Chat sends your message plus subjects, exam dates, topic statuses, and upcoming open tasks to Google. The app excludes your name and college. Free-tier prompts may be used by Google to improve its products. Use a project with billing disabled if you want to avoid accidental paid API usage, and check your project’s quota. Gemini needs internet; the offline planner remains available.</div></section>';
         var appearanceCard = '<section class="settings-card"><h2>Appearance</h2><p>Choose the theme that is easier to read. Your choice is saved on this device.</p><div class="settings-actions"><button class="button button-primary" type="button" data-action="toggle-theme">Switch to ' + (state.theme === "dark" ? "light" : "dark") + ' mode</button><span class="field-help" style="align-self:center">Current: ' + (state.theme === "dark" ? "Dark" : "Light") + '</span></div></section>';
         return top + '<div class="settings-grid"><section class="settings-card"><h2>Student profile</h2><p>' + esc(profile.displayName ? profile.displayName + " · " : "") + esc(profileSummary) + '</p><div class="settings-actions"><button class="button" type="button" data-action="edit-profile">Edit profile</button></div></section>' + appearanceCard + keyCard + '<section class="settings-card"><h2>Local demo data</h2><p>Your profile, subjects, tasks, and progress are saved in this browser. They are not synced to another device. Export a JSON backup if you want to move your semester data.</p><div class="settings-actions"><button class="button button-primary" type="button" data-action="export">Export backup</button><button class="button" type="button" data-action="import">Import backup</button><input id="import-file" type="file" accept="application/json,.json" class="hidden"></div></section><section class="settings-card"><h2>Reset sample workspace</h2><p>Restore the sample subjects, exam dates, and tasks while keeping your student profile.</p><div class="settings-actions"><button class="button" type="button" data-action="reset">Restore sample data</button></div></section></div><div class="demo-note"><strong>Privacy</strong><span>AI Chat sends your message and study context only when you send it; the study planner sends selected subject details after you accept its notice. Your name and college details are excluded. Gemini requests need internet. All other study data stays on this device by default.</span></div>';
       }
@@ -799,12 +810,35 @@
         }
         return html + '</article>';
       }
+      function chatEmptyMarkup() {
+        return '<div class="chat-empty"><div class="chat-empty-mark" aria-hidden="true">✦</div><h2>Your study assistant is ready</h2><p>Ask about a subject, request a revision plan, or tell it to add a study task. It will show proposed app changes here for you to approve.</p>' + (!apiKey ? '<button class="button button-primary" style="margin:16px auto 0" type="button" data-page="settings">Add API key in Data & settings</button>' : '') + '</div>';
+      }
+      function chatFeedMarkup() {
+        var content = state.chatMessages.length ? state.chatMessages.map(renderChatMessage).join("") : chatEmptyMarkup();
+        if (chatLoading) content += '<article class="chat-message assistant" aria-live="polite"><div class="chat-message-label">Semester Sathi AI</div><div>Thinking…</div></article>';
+        return content;
+      }
+      function refreshChatFeed(forceBottom) {
+        var feed = document.getElementById("chat-feed");
+        if (!feed) return;
+        var previousTop = feed.scrollTop;
+        var nearBottom = feed.scrollHeight - feed.clientHeight - previousTop < 72;
+        feed.innerHTML = chatFeedMarkup();
+        if (forceBottom || nearBottom) feed.scrollTop = feed.scrollHeight;
+        else feed.scrollTop = previousTop;
+      }
+      function updateChatBusyUI() {
+        var button = document.querySelector("#chat-form button[type='submit']");
+        if (button) { button.disabled = chatLoading; button.textContent = chatLoading ? "Thinking…" : "Send"; }
+        var status = document.getElementById("chat-api-status");
+        if (status) status.textContent = chatLoading ? "Gemini is replying…" : apiKey ? "Gemini key saved · ready when online" : "Add a Gemini key to start chatting";
+      }
       function renderChatPage() {
         var top = pageHeading("Chat with your study AI", "Ask for explanations, revision advice, or changes to your study schedule.", '<button class="button button-small" type="button" data-action="clear-chat"' + (state.chatMessages.length ? '' : ' disabled') + '>Clear chat</button>');
-        var status = apiKey ? '<span class="chat-api-status">Gemini connected for this session · online</span>' : '<span class="chat-api-status">Add a Gemini key to start chatting</span>';
-        var feedContent = state.chatMessages.length ? state.chatMessages.map(renderChatMessage).join("") : '<div class="chat-empty"><div class="chat-empty-mark" aria-hidden="true">✦</div><h2>Your study assistant is ready</h2><p>Ask about a subject, request a revision plan, or tell it to add a study task. It will show proposed app changes here for you to approve.</p>' + (!apiKey ? '<button class="button button-primary" style="margin:16px auto 0" type="button" data-page="settings">Add API key in Data & settings</button>' : '') + '</div>';
-        var form = apiKey ? '<form id="chat-form" class="chat-compose"><div class="chat-compose-row"><textarea id="chat-input" name="message" maxlength="1200" placeholder="Ask about your subjects, or request a study task…" aria-label="Message Semester Sathi AI" required' + (chatLoading ? ' disabled' : '') + '></textarea><button class="button button-primary" type="submit"' + (chatLoading ? ' disabled' : '') + '>' + (chatLoading ? 'Thinking…' : 'Send') + '</button></div><div class="chat-compose-note"><span>Your message and study context are sent to Google using your key. Profile and college details are excluded.</span><span>AI changes require your approval · Enter to send</span></div></form>' : '<div class="chat-compose"><div class="chat-toolbar"><span class="field-help">The key you save in Data & settings unlocks Gemini chat here.</span><button class="button button-primary" type="button" data-page="settings">Open Data & settings</button></div></div>';
-        return top + '<div class="chat-toolbar">' + status + (chatLoading ? '<span class="chat-api-status">Gemini is replying…</span>' : '') + '</div><section class="panel chat-shell" aria-label="AI chat"><div id="chat-feed" class="chat-feed" aria-live="polite">' + feedContent + (chatLoading ? '<article class="chat-message assistant"><div class="chat-message-label">Semester Sathi AI</div><div>Thinking…</div></article>' : '') + '</div>' + form + '</section>';
+        var status = apiKey ? "Gemini key saved · ready when online" : "Add a Gemini key to start chatting";
+        var feedContent = chatFeedMarkup();
+        var form = apiKey ? '<form id="chat-form" class="chat-compose"><div class="chat-compose-row"><textarea id="chat-input" name="message" maxlength="1200" placeholder="Ask about your subjects, or request a study task…" aria-label="Message Semester Sathi AI" required></textarea><button class="button button-primary" type="submit"' + (chatLoading ? ' disabled' : '') + '>' + (chatLoading ? 'Thinking…' : 'Send') + '</button></div><div class="chat-compose-note"><span>Your message and study context are sent to Google using your key. Profile and college details are excluded.</span><span id="chat-api-status" class="chat-api-status" role="status">' + (chatLoading ? 'Gemini is replying…' : status) + '</span></div></form>' : '<div class="chat-compose"><div class="chat-toolbar"><span class="field-help">The key you save in Data & settings unlocks Gemini chat here.</span><button class="button button-primary" type="button" data-page="settings">Open Data & settings</button></div></div>';
+        return top + '<div class="chat-toolbar"><span class="chat-api-status">' + status + '</span></div><section class="panel chat-shell" aria-label="AI chat"><div id="chat-feed" class="chat-feed" aria-live="polite">' + feedContent + '</div>' + form + '</section>';
       }
       function openOnboarding(editing) {
         var profile = state.profile || {};
@@ -996,6 +1030,73 @@
           required: ["reply", "actions"]
         };
       }
+      function googleErrorMessage(status, data) {
+        var error = data && data.error || {};
+        var message = String(error.message || data && data.message || "No error message was returned.");
+        var statusText = String(error.status || "");
+        if (status === 429) return "Google API quota or rate limit (429" + (statusText ? " " + statusText : "") + "): " + message + " Check the project's AI Studio limits; waiting may be required.";
+        if (status === 400) return "Google rejected the request (400): " + message;
+        if (status === 401 || status === 403) return "Google rejected the API key or its access (HTTP " + status + "): " + message;
+        if (status === 404) return "Google could not find this model or API endpoint (404): " + message;
+        return "Google API error (HTTP " + status + (statusText ? " " + statusText : "") + "): " + message;
+      }
+      async function fetchGeminiInteraction(input, schema) {
+        var payload = { model: "gemini-3.5-flash-lite", input: input, store: false };
+        if (schema) payload.response_format = { type: "text", mime_type: "application/json", schema: schema };
+        var lastError;
+        for (var attempt = 0; attempt < 2; attempt++) {
+          var controller = typeof AbortController === "function" ? new AbortController() : null;
+          var timedOut = false;
+          var timeoutId = controller ? setTimeout(function () { timedOut = true; controller.abort(); }, 45000) : null;
+          try {
+            var response = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+              body: JSON.stringify(payload),
+              signal: controller ? controller.signal : undefined
+            });
+            var rawBody = await response.text();
+            var data;
+            try { data = rawBody ? JSON.parse(rawBody) : {}; }
+            catch (parseError) { data = {}; }
+            if (!response.ok) {
+              var httpError = new Error(googleErrorMessage(response.status, data));
+              httpError.status = response.status;
+              httpError.retryable = [408, 500, 502, 503, 504].includes(response.status);
+              throw httpError;
+            }
+            if (!data || typeof data !== "object") throw new Error("Google returned an unreadable response. Please try again.");
+            return data;
+          } catch (error) {
+            lastError = error;
+            var networkFailure = error && (error.name === "TypeError" || error.name === "AbortError");
+            var retryable = networkFailure || timedOut || error && error.retryable;
+            if (attempt === 0 && retryable) {
+              await new Promise(function (resolve) { setTimeout(resolve, 900); });
+              continue;
+            }
+            if (networkFailure || timedOut) throw new Error("Could not reach Google after one retry. Check the phone's internet connection and try again.");
+            throw error;
+          } finally {
+            if (timeoutId !== null) clearTimeout(timeoutId);
+          }
+        }
+        throw lastError || new Error("Gemini request failed. Please try again.");
+      }
+      async function testGeminiConnection(button) {
+        if (!apiKey) { showToast("Save your Gemini API key first."); return; }
+        var originalText = button ? button.textContent : "";
+        if (button) { button.disabled = true; button.textContent = "Checking…"; }
+        try {
+          var data = await fetchGeminiInteraction("Reply with the single word OK.", null);
+          if (!interactionText(data).trim()) throw new Error("Google responded, but returned no text. Try AI Chat and inspect any detailed error there.");
+          showToast("Gemini connection works. AI Chat is ready.");
+        } catch (error) {
+          showToast(error && error.message ? error.message : "Gemini connection failed. Check the API key and internet.");
+        } finally {
+          if (button && button.isConnected) { button.disabled = false; button.textContent = originalText; }
+        }
+      }
       async function sendGeminiChat() {
         if (!apiKey) { showToast("Save your Gemini key in Data & settings first."); return; }
         var input = document.getElementById("chat-input");
@@ -1004,24 +1105,16 @@
         state.chatMessages.push({ role: "user", text: userText });
         state.chatMessages = state.chatMessages.slice(-60);
         chatLoading = true;
+        input.value = "";
         saveState();
-        render();
+        updateChatBusyUI();
+        refreshChatFeed(true);
         var recent = state.chatMessages.slice(-12).map(function (message) {
           return (message.role === "user" ? "Student" : "Assistant") + ": " + message.text;
         }).join("\n");
         var prompt = "You are Semester Sathi, a concise and supportive study assistant. Answer questions naturally and use the supplied study context when relevant. Do not claim that app data changed unless you include a proposed action. You may suggest these app changes: add_task, set_topic_status, or add_topic. Use exact subject and topic names from the context. Dates must use YYYY-MM-DD, times HH:MM (24-hour), and task durations 5 to 240 minutes. Suggest at most 5 actions. For an action that does not match a real subject/topic or valid date, do not include it. Never output code or arbitrary commands. Always return JSON with a helpful reply and an actions array; use an empty actions array when no app change is needed. Current app context (no student name or college details): " + JSON.stringify(chatStudyContext()) + "\n\nRecent conversation:\n" + recent;
         try {
-          var response = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-            body: JSON.stringify({ model: "gemini-3.5-flash-lite", input: prompt, store: false, response_format: { type: "text", mime_type: "application/json", schema: chatActionSchema() } })
-          });
-          var data = await response.json();
-          if (!response.ok) {
-            if (response.status === 429) throw new Error("Gemini's free quota or rate limit was reached. Check your AI Studio usage, or try later.");
-            if (response.status === 400 || response.status === 403) throw new Error("Gemini could not use this key or model for the current project. Check the key and its access.");
-            throw new Error("Gemini request failed. Check your connection and try again.");
-          }
+          var data = await fetchGeminiInteraction(prompt, chatActionSchema());
           var rawText = interactionText(data).trim();
           if (!rawText) throw new Error("Gemini returned an empty reply. Please try again.");
           var result;
@@ -1036,7 +1129,8 @@
           state.chatMessages = state.chatMessages.slice(-60);
           chatLoading = false;
           saveState();
-          render();
+          updateChatBusyUI();
+          refreshChatFeed(false);
         }
       }
       function applyChatActions(messageIndex) {
@@ -1061,7 +1155,7 @@
         message.pending = false;
         message.applied = true;
         saveState();
-        render();
+        refreshChatFeed(false);
         showToast("AI changes applied to your study workspace.");
       }
       async function generateGeminiPlan(button) {
@@ -1084,18 +1178,7 @@
         button.disabled = true;
         button.textContent = "Planning…";
         try {
-          var response = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-            body: JSON.stringify({ model: "gemini-3.5-flash-lite", input: prompt, store: false, response_format: { type: "text", mime_type: "application/json", schema: schema } })
-          });
-          var data = await response.json();
-          if (!response.ok) {
-            var code = data && data.error && data.error.code;
-            if (response.status === 429) throw new Error("Gemini's free quota or rate limit was reached. Check your AI Studio usage, or use the offline planner.");
-            if (response.status === 400 || response.status === 403) throw new Error("Gemini could not use this key or model for the current project. Check your AI Studio key and free-tier access.");
-            throw new Error("Gemini request failed" + (code ? " (" + code + ")" : "") + ". Try again or use the offline planner.");
-          }
+          var data = await fetchGeminiInteraction(prompt, schema);
           var rawText = interactionText(data).replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
           if (!rawText) throw new Error("Gemini returned an empty plan. Try the offline planner.");
           var result;
@@ -1285,10 +1368,11 @@
         if (name === "build-plan") openPlanModal();
         else if (name === "generate-offline") generateOfflinePlan();
         else if (name === "generate-ai") generateGeminiPlan(document.getElementById("generate-gemini-button"));
+        else if (name === "test-api") testGeminiConnection(action);
         else if (name === "apply-chat-actions") applyChatActions(Number(action.dataset.messageIndex));
         else if (name === "dismiss-chat-actions") {
           var dismissedMessage = state.chatMessages[Number(action.dataset.messageIndex)];
-          if (dismissedMessage && dismissedMessage.pending) { dismissedMessage.pending = false; dismissedMessage.dismissed = true; saveState(); render(); }
+          if (dismissedMessage && dismissedMessage.pending) { dismissedMessage.pending = false; dismissedMessage.dismissed = true; saveState(); refreshChatFeed(false); }
         }
         else if (name === "clear-chat") {
           state.chatMessages = [];

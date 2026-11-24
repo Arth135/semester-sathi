@@ -21,6 +21,7 @@ Gemini AI
 - “Build study plan” also offers an offline planner and optional Gemini generation. Gemini requests use Google's Interactions API with store=false.
 - Messages sent from AI Chat include your message, subject names, exam dates, topic statuses, and upcoming open tasks. Your profile name and college are excluded. The app keeps chat history locally on the device.
 - Gemini needs internet. API availability, free-tier eligibility, limits, and pricing depend on the Google AI Studio project and may change. Free-tier prompts may be used to improve Google products. Review current Google AI Studio usage and terms.
+- Use “Test connection” in Data & settings to check whether Google can accept the saved key. The app shows Google's returned quota, key, or request error details. Temporary network/server errors are retried once.
 - The API key stays in session storage for the current app/browser session. It is not part of the app files or JSON backup. Clear it from Settings or close the app/tab.
 
 Data and limitations
