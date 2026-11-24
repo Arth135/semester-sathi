@@ -17,7 +17,7 @@ Appearance
 Gemini AI
 - Create a personal key at https://aistudio.google.com/apikey and save it on this device in Data & settings.
 - After saving the key, choose AI Chat in the main navigation to ask questions about your subjects or request schedule changes.
-- AI Chat can propose study tasks, new chapters / lessons, or topic status changes. Review each proposal and select Apply changes; the app does not apply AI changes automatically. Approved task proposals also schedule a phone reminder in the Android APK.
+- AI Chat can propose subjects, study tasks, new chapters / lessons, or topic status changes. A subject proposal includes an exam date and can include chapters / lessons. Review each proposal and select Apply changes; the app does not apply AI changes automatically. Approved task proposals also schedule a phone reminder in the Android APK.
 - “Build study plan” also offers an offline planner and optional Gemini generation. Gemini requests use Google's Interactions API with store=false.
 - Messages sent from AI Chat include your message, subject names, exam dates, topic statuses, and upcoming open tasks. Your profile name and college are excluded. The app keeps chat history locally on the device.
 - Gemini needs internet. API availability, free-tier eligibility, limits, and pricing depend on the Google AI Studio project and may change. Free-tier prompts may be used to improve Google products. Review current Google AI Studio usage and terms.

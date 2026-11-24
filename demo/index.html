@@ -820,6 +820,7 @@
       }
       function chatActionDescription(action) {
         var subjectLabel = action.subject || "General";
+        if (action.type === "add_subject") return "Add subject “" + action.name + "” with exam on " + action.examDate + (action.topics.length ? " and " + action.topics.length + " chapters / lessons" : "");
         if (action.type === "add_task") return "Add “" + action.title + "” for " + subjectLabel + " on " + action.date + " at " + action.time + " (" + action.duration_minutes + " min)";
         if (action.type === "set_topic_status") return "Mark “" + action.topic + "” in " + subjectLabel + " as " + action.status;
         if (action.type === "add_topic") return "Add “" + action.topic + "” to " + subjectLabel;
@@ -1019,6 +1020,18 @@
           var action = { type: String(raw.type || "").trim() };
           var subjectLabel = String(raw.subject || "").trim();
           var subject = subjectLabel ? state.subjects.find(function (item) { return item.name.toLowerCase() === subjectLabel.toLowerCase(); }) : null;
+          if (action.type === "add_subject") {
+            var subjectName = String(raw.name || raw.subject || "").trim().slice(0, 50);
+            var examDate = String(raw.exam_date || "").trim();
+            var duplicate = state.subjects.some(function (item) { return item.name.toLowerCase() === subjectName.toLowerCase(); });
+            if (!subjectName || duplicate || state.subjects.length >= 30 || !/^\d{4}-\d{2}-\d{2}$/.test(examDate) || localISO(parseLocal(examDate)) !== examDate) return;
+            var examTime = String(raw.exam_time || "").trim();
+            if (examTime && (!/^\d{2}:\d{2}$/.test(examTime) || Number(examTime.slice(0, 2)) > 23 || Number(examTime.slice(3)) > 59)) examTime = "";
+            var topics = Array.isArray(raw.topics) ? raw.topics.map(function (topic) { return String(topic || "").trim().slice(0, 80); }).filter(Boolean) : [];
+            topics = topics.filter(function (topic, index) { return topics.findIndex(function (other) { return other.toLowerCase() === topic.toLowerCase(); }) === index; }).slice(0, 30);
+            accepted.push({ type: action.type, name: subjectName, code: String(raw.code || "").trim().slice(0, 20), examDate: examDate, examTime: examTime, room: String(raw.room || "").trim().slice(0, 50), topics: topics });
+            return;
+          }
           if (action.type === "add_task") {
             var title = String(raw.title || "").trim().slice(0, 100);
             var date = String(raw.date || "").trim();
@@ -1052,7 +1065,9 @@
             actions: { type: "array", items: { type: "object", properties: {
               type: { type: "string" }, subject: { type: "string" }, title: { type: "string" },
               date: { type: "string" }, time: { type: "string" }, duration_minutes: { type: "integer" },
-              topic: { type: "string" }, status: { type: "string" }
+              topic: { type: "string" }, status: { type: "string" }, name: { type: "string" },
+              code: { type: "string" }, exam_date: { type: "string" }, exam_time: { type: "string" },
+              room: { type: "string" }, topics: { type: "array", items: { type: "string" } }
             }, required: ["type"] } }
           },
           required: ["reply", "actions"]
@@ -1140,7 +1155,7 @@
         var recent = state.chatMessages.slice(-12).map(function (message) {
           return (message.role === "user" ? "Student" : "Assistant") + ": " + message.text;
         }).join("\n");
-        var prompt = "You are Semester Sathi, a concise and supportive study assistant. Answer questions naturally and use the supplied study context when relevant. Do not claim that app data changed unless you include a proposed action. You may suggest these app changes: add_task, set_topic_status, or add_topic. Use exact subject and topic names from the context. Dates must use YYYY-MM-DD, times HH:MM (24-hour), and task durations 5 to 240 minutes. Suggest at most 5 actions. For an action that does not match a real subject/topic or valid date, do not include it. Never output code or arbitrary commands. Always return JSON with a helpful reply and an actions array; use an empty actions array when no app change is needed. Current app context (no student name or college details): " + JSON.stringify(chatStudyContext()) + "\n\nRecent conversation:\n" + recent;
+        var prompt = "You are Semester Sathi, a concise and supportive study assistant. Answer questions naturally and use the supplied study context when relevant. Do not claim that app data changed unless you include a proposed action. You may suggest these app changes: add_subject, add_task, set_topic_status, or add_topic. To add a subject, use type add_subject, name, exam_date (YYYY-MM-DD), optional exam_time (HH:MM), code, room, and a topics array of chapter or lesson names. If the student has not provided an exam date, ask for it instead of proposing a subject. Do not propose a subject already in the context. For other actions, use exact subject and topic names from the context. Dates must use YYYY-MM-DD, times HH:MM (24-hour), and task durations 5 to 240 minutes. Suggest at most 5 actions. For an action that does not match a real subject/topic or valid date, do not include it. Never output code or arbitrary commands. Always return JSON with a helpful reply and an actions array; use an empty actions array when no app change is needed. Current app context (no student name or college details): " + JSON.stringify(chatStudyContext()) + "\n\nRecent conversation:\n" + recent;
         try {
           var data = await fetchGeminiInteraction(prompt, chatActionSchema());
           var rawText = interactionText(data).trim();
@@ -1165,7 +1180,13 @@
         var message = state.chatMessages[messageIndex];
         if (!message || !message.pending || !Array.isArray(message.actions)) return;
         message.actions.forEach(function (action) {
-          if (action.type === "add_task") {
+          if (action.type === "add_subject") {
+            var alreadyExists = state.subjects.some(function (item) { return item.name.toLowerCase() === action.name.toLowerCase(); });
+            if (!alreadyExists && state.subjects.length < 30) {
+              var colors = ["#8b6bb0", "#d17658", "#478a93", "#bd9b38"];
+              state.subjects.push({ id: uid(), name: action.name, code: action.code, examDate: action.examDate, examTime: action.examTime, room: action.room, color: colors[state.subjects.length % colors.length], topics: action.topics.map(function (topic) { return { name: topic, status: "not-started" }; }) });
+            }
+          } else if (action.type === "add_task") {
             var task = { id: uid(), title: action.title, subjectId: action.subjectId, date: action.date, time: action.time, duration: action.duration_minutes, type: "AI chat study task", completed: false, generated: true, reminderEnabled: true };
             state.tasks.push(task);
             scheduleNativeReminder(task);

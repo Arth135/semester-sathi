@@ -4,11 +4,11 @@ Semester Sathi is an offline-first semester planner for Android and modern deskt
 
 ## Download and try it
 
-- Android APK (version 0.1.2): [downloads/Semester-Sathi-0.1.2-debug.apk](downloads/Semester-Sathi-0.1.2-debug.apk)
+- Android APK (version 0.1.3): [downloads/Semester-Sathi-0.1.3-debug.apk](downloads/Semester-Sathi-0.1.3-debug.apk)
 - Android source project: [downloads/semester-sathi-android-source.zip](downloads/semester-sathi-android-source.zip)
 - Browser demo: open [demo/index.html](demo/index.html), or download [downloads/semester-sathi-demo.zip](downloads/semester-sathi-demo.zip)
 
-The APK is a debug build for personal testing. Copy it to your phone, open it, and allow installation from that file manager if Android asks. Allow notifications if you want task reminders. If updating from version 0.1.0 or 0.1.1, the first launch migrates existing semester data and any API key still available in the prior app session. A key saved in this version is stored securely for later launches.
+The APK is a debug build for personal testing. Copy it to your phone, open it, and allow installation from that file manager if Android asks. Allow notifications if you want task reminders. If updating from version 0.1.0–0.1.2, the first launch migrates existing semester data and any API key still available in the prior app session. A key saved in the app is stored securely for later launches.
 
 ## Features
 
@@ -28,7 +28,7 @@ The APK is a debug build for personal testing. Copy it to your phone, open it, a
 2. In Semester Sathi, open Data & settings, paste the key, and save it on this device.
 3. Choose AI Chat to chat, or Build study plan to request a plan. Use Test connection in settings if requests fail.
 
-Gemini requests go directly from the app to Google; there is no backend server. The key is not embedded in this repository or APK and is not included in backups. Android encrypts it with Android Keystore for reuse between app launches; the browser demo saves it in that browser. Use Clear in Settings to remove it. Chat sends the prompt and relevant study context (subjects, exam dates, topic statuses, and upcoming open tasks); profile name and college fields are excluded. AI can propose study tasks, chapters or lessons, and topic-status changes. Review each proposal and choose Apply changes before the app changes local data.
+Gemini requests go directly from the app to Google; there is no backend server. The key is not embedded in this repository or APK and is not included in backups. Android encrypts it with Android Keystore for reuse between app launches; the browser demo saves it in that browser. Use Clear in Settings to remove it. Chat sends the prompt and relevant study context (subjects, exam dates, topic statuses, and upcoming open tasks); profile name and college fields are excluded. AI can propose subjects, study tasks, chapters or lessons, and topic-status changes. Subject proposals include an exam date and optional chapters or lessons. Review each proposal and choose Apply changes before the app changes local data.
 
 Gemini requires internet. Model availability, free-tier eligibility, limits, and pricing are set by Google and may change. See Google's current [Gemini API pricing and terms](https://ai.google.dev/gemini-api/docs/pricing/). A 429 response usually means a project quota or rate limit was reached; wait for the quota window or review the Google AI Studio project limits.
 
