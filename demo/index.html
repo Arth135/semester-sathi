@@ -96,10 +96,20 @@
       border-bottom: 1px solid var(--line);
     }
     .topbar-left { display: flex; align-items: center; gap: 12px; }
-    .mobile-brand { display: none; }
+    .mobile-brand { display: none; border: 0; background: transparent; color: inherit; cursor: pointer; }
     .top-caption { color: var(--muted); font-size: 13px; }
     .topbar-actions { display: flex; align-items: center; gap: 10px; }
     .avatar { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 50%; background: #dcece3; color: var(--green-dark); font-size: 13px; font-weight: 700; }
+    .profile-wrap { position: relative; }
+    .profile-button { border: 0; cursor: pointer; }
+    .profile-menu { position: absolute; z-index: 40; top: calc(100% + 10px); right: 0; display: grid; gap: 5px; width: 230px; padding: 10px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); box-shadow: var(--shadow); }
+    .profile-menu[hidden] { display: none; }
+    .profile-menu-summary { display: grid; gap: 3px; padding: 8px 9px 10px; border-bottom: 1px solid var(--line); }
+    .profile-menu-summary strong { font-size: 14px; }
+    .profile-menu-summary span { color: var(--muted); font-size: 12px; line-height: 1.4; }
+    .profile-menu-item { width: 100%; min-height: 40px; padding: 9px; border: 0; border-radius: 10px; background: transparent; color: var(--ink); text-align: left; font-size: 14px; font-weight: 650; cursor: pointer; }
+    .profile-menu-item:hover { background: var(--surface-soft); }
+    .mobile-menu-dock { display: none; }
     .main-content { width: min(100%, 1440px); min-width: 0; margin: 0 auto; padding: 30px clamp(22px, 4vw, 54px) 42px; }
     .page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-bottom: 24px; }
     .eyebrow { margin: 0 0 7px; color: var(--green); font-size: 12px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; }
@@ -254,6 +264,24 @@
     .chat-compose-note { display: flex; justify-content: space-between; gap: 10px; margin-top: 9px; color: var(--muted); font-size: 11px; line-height: 1.4; }
     .chat-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
     .chat-api-status { color: var(--muted); font-size: 12px; }
+    .chat-attachments { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 10px; }
+    .chat-attachment-chip { display: inline-flex; align-items: center; gap: 7px; max-width: 100%; padding: 6px 8px 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-soft); color: var(--muted); font-size: 12px; }
+    .chat-attachment-chip span { overflow: hidden; max-width: min(55vw,260px); text-overflow: ellipsis; white-space: nowrap; }
+    .chat-attachment-chip button { width: 21px; height: 21px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
+    .chat-file-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+    .chat-file-tag { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 999px; background: var(--green-soft); color: var(--green-dark); font-size: 11px; font-weight: 650; }
+    .chat-upload-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 9px; }
+    .chat-upload-row .button { min-height: 35px; padding: 6px 10px; font-size: 12px; }
+    .chat-compose-note small { display: block; max-width: 720px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .file-list { display: grid; gap: 10px; }
+    .file-card { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 13px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+    .file-kind { display: grid; flex: 0 0 auto; width: 42px; height: 42px; place-items: center; border-radius: 12px; background: var(--green-soft); color: var(--green-dark); font-size: 12px; font-weight: 800; text-transform: uppercase; }
+    .file-main { flex: 1; min-width: 0; }
+    .file-name { overflow: hidden; font-size: 14px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+    .file-meta { margin-top: 4px; color: var(--muted); font-size: 12px; }
+    .file-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+    .file-actions .button { min-height: 34px; padding: 6px 9px; font-size: 12px; }
+    .file-disclosure { margin: 14px 0 0; padding: 12px 13px; border-radius: 12px; background: var(--blue-soft); color: var(--muted); font-size: 12px; line-height: 1.5; }
     :root[data-theme="dark"] .chat-compose-row textarea { background: #15211b; }
     :root[data-theme="dark"] .chat-message.assistant { background: var(--surface-soft); }
     .site-footer { display: flex; justify-content: space-between; gap: 14px; padding: 0 clamp(22px, 4vw, 54px) 22px; color: var(--muted); font-size: 12px; }
@@ -360,15 +388,18 @@
       .agenda-panel { min-height: 220px; }
     }
     @media (max-width: 760px) {
-      .app-shell { display: block; padding-bottom: 76px; }
-      .sidebar { position: fixed; z-index: 15; inset: auto 0 0; display: block; width: 100%; height: 68px; padding: 7px 8px; border-top: 1px solid var(--line); border-right: 0; box-shadow: 0 -8px 24px rgba(29,57,43,.06); }
+      .app-shell { display: block; padding-bottom: 72px; }
+      .sidebar { position: fixed; z-index: 30; inset: auto 0 0; display: block; width: 100%; height: 64px; padding: 7px 14px calc(7px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); border-right: 0; box-shadow: 0 -8px 24px rgba(29,57,43,.06); }
       .brand, .side-label, .sidebar-spacer, .local-badge { display: none; }
-      .nav-list { display: flex; justify-content: flex-start; gap: 2px; overflow-x: auto; scrollbar-width: none; }
-      .nav-list::-webkit-scrollbar { display: none; }
-      .nav-button { display: grid; flex: 1 0 58px; justify-items: center; align-content: center; gap: 2px; min-width: 58px; min-height: 52px; padding: 4px; border-radius: 10px; font-size: 11px; }
-      .nav-glyph { width: 25px; height: 23px; font-size: 16px; }
+      .nav-list { position: absolute; inset: auto 12px calc(100% + 9px); display: none; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5px; max-height: min(68vh,520px); overflow-y: auto; padding: 11px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); box-shadow: var(--shadow); }
+      .sidebar.is-open .nav-list { display: grid; }
+      .nav-button { min-height: 45px; }
+      .mobile-menu-dock { display: flex; align-items: center; justify-content: space-between; min-height: 46px; }
+      .mobile-menu-button { display: inline-flex; align-items: center; gap: 9px; min-height: 42px; padding: 8px 13px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); font-size: 14px; font-weight: 700; cursor: pointer; }
+      .mobile-menu-glyph { font-size: 18px; line-height: 1; }
+      .mobile-menu-hint { color: var(--muted); font-size: 11px; }
       .topbar { min-height: 66px; padding: 11px 18px; }
-      .mobile-brand { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 750; }
+      .mobile-brand { display: flex; align-items: center; gap: 8px; padding: 0; font-size: 14px; font-weight: 750; }
       .mobile-brand .brand-mark { width: 32px; height: 32px; border-radius: 10px; font-size: 15px; }
       .top-caption { display: none; }
       .topbar-actions .button { min-height: 37px; padding: 7px 10px; font-size: 12px; }
@@ -413,6 +444,9 @@
       .chat-message { max-width: 94%; }
       .chat-compose { padding: 12px; }
       .chat-compose-note { flex-direction: column; gap: 3px; }
+      .chat-upload-row { gap: 6px; }
+      .file-card { align-items: flex-start; flex-wrap: wrap; }
+      .file-actions { width: 100%; justify-content: flex-start; padding-left: 54px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
@@ -428,15 +462,16 @@
         <div><div class="brand-name">Semester Sathi</div><div class="brand-subtitle">Your semester planner</div></div>
       </div>
       <p class="side-label">Workspace</p>
-      <nav class="nav-list" aria-label="App sections">
+      <nav id="app-navigation" class="nav-list" aria-label="App sections">
         <button class="nav-button" type="button" data-page="overview"><span class="nav-glyph" aria-hidden="true">⌂</span><span>Overview</span></button>
         <button class="nav-button" type="button" data-page="calendar"><span class="nav-glyph" aria-hidden="true">▦</span><span>Calendar</span></button>
         <button class="nav-button" type="button" data-page="subjects"><span class="nav-glyph" aria-hidden="true">▤</span><span>Subjects</span></button>
         <button class="nav-button" type="button" data-page="tasks"><span class="nav-glyph" aria-hidden="true">✓</span><span>To-dos</span></button>
+        <button class="nav-button" type="button" data-page="files"><span class="nav-glyph" aria-hidden="true">▧</span><span>Files</span></button>
         <button class="nav-button" type="button" data-page="chat"><span class="nav-glyph" aria-hidden="true">✦</span><span>AI Chat</span></button>
         <button class="nav-button" type="button" data-page="progress"><span class="nav-glyph" aria-hidden="true">◔</span><span>Progress</span></button>
-        <button class="nav-button" type="button" data-page="settings"><span class="nav-glyph" aria-hidden="true">⚙</span><span>Data & settings</span></button>
       </nav>
+      <div class="mobile-menu-dock"><button class="mobile-menu-button" type="button" data-action="toggle-nav" aria-expanded="false" aria-controls="app-navigation"><span class="mobile-menu-glyph" aria-hidden="true">☰</span><span>Sections</span></button><span class="mobile-menu-hint">Tap a section to switch</span></div>
       <div class="sidebar-spacer"></div>
       <div class="local-badge">
         <span class="local-icon" aria-hidden="true"></span>
@@ -447,13 +482,13 @@
     <div class="workspace">
       <header class="topbar">
         <div class="topbar-left">
-          <div class="mobile-brand"><span class="brand-mark" aria-hidden="true">S</span>Semester Sathi</div>
+          <button class="mobile-brand" type="button" data-action="toggle-nav" aria-label="Open app sections" aria-expanded="false" aria-controls="app-navigation"><span class="brand-mark" aria-hidden="true">S</span>Semester Sathi</button>
           <span id="top-caption" class="top-caption">Your study workspace</span>
         </div>
         <div class="topbar-actions">
           <button class="button top-add-task" type="button" data-action="add-task">Add task</button>
           <button class="button button-primary" type="button" data-action="build-plan">Build study plan</button>
-          <span id="avatar-initial" class="avatar" aria-label="Student profile">S</span>
+          <div class="profile-wrap"><button id="avatar-initial" class="avatar profile-button" type="button" data-action="toggle-profile-menu" aria-label="Open profile menu" aria-expanded="false" aria-controls="profile-menu">S</button><div id="profile-menu" class="profile-menu" hidden><div class="profile-menu-summary"><strong id="profile-menu-name">Student profile</strong><span id="profile-menu-summary">Your study details</span></div><button class="profile-menu-item" type="button" data-action="edit-profile">Student profile</button><button class="profile-menu-item" type="button" data-page="settings">Data & settings</button></div></div>
         </div>
       </header>
       <main id="main-content" class="main-content" tabindex="-1"></main>
@@ -474,6 +509,7 @@
         calendar: ["Calendar", "Tap a date to see exams and study tasks"],
         subjects: ["Subjects", "Track syllabus topics and exam details"],
         tasks: ["To-dos", "Small study steps, ready to tick off"],
+        files: ["Files", "Keep your study documents on this device"],
         chat: ["AI Chat", "Chat with Gemini about your semester"],
         progress: ["Progress", "See how your preparation is moving"],
         settings: ["Data & settings", "Your demo data stays in this browser"]
@@ -540,7 +576,7 @@
           { id: "demo-6", title: "Review errors from the mock test", subjectId: "physics", date: dayOffset(3), time: "18:00", duration: 35, type: "Revision", completed: false, generated: false },
           { id: "demo-7", title: "Complete the integration worksheet", subjectId: "mathematics", date: dayOffset(4), time: "15:00", duration: 50, type: "Assignment", completed: false, generated: false }
         ];
-        return { semester: "Semester 4", profile: null, today: today, selectedDate: today, viewMonth: today.slice(0, 7), page: "overview", taskFilter: "all", theme: "light", subjects: subjects, tasks: tasks, chatMessages: [] };
+        return { semester: "Semester 4", profile: null, today: today, selectedDate: today, viewMonth: today.slice(0, 7), page: "overview", taskFilter: "all", theme: "light", subjects: subjects, tasks: tasks, files: [], chatDraftAttachmentIds: [], chatMessages: [] };
       }
 
       function loadState() {
@@ -550,6 +586,10 @@
           var parsed = JSON.parse(raw);
           if (!parsed || !Array.isArray(parsed.subjects) || !Array.isArray(parsed.tasks)) return sampleState();
           if (parsed.theme !== "dark" && parsed.theme !== "light") parsed.theme = "light";
+          if (!Array.isArray(parsed.files)) parsed.files = [];
+          parsed.files = parsed.files.filter(function (file) { return file && typeof file.id === "string" && typeof file.name === "string"; }).slice(0, 500);
+          if (!Array.isArray(parsed.chatDraftAttachmentIds)) parsed.chatDraftAttachmentIds = [];
+          parsed.chatDraftAttachmentIds = parsed.chatDraftAttachmentIds.filter(function (id) { return typeof id === "string"; }).slice(0, 5);
           if (!Array.isArray(parsed.chatMessages)) parsed.chatMessages = [];
           parsed.chatMessages = parsed.chatMessages.filter(function (message) { return message && (message.role === "user" || message.role === "assistant") && typeof message.text === "string"; }).slice(-60);
           parsed.subjects.forEach(function (subject) { delete subject.progressOverride; });
@@ -568,6 +608,77 @@
       }
       restoreAndroidMigration();
       var state = loadState();
+      var chatAttachmentIds = state.chatDraftAttachmentIds.slice();
+      var documentDbPromise = openDocumentDb();
+      function openDocumentDb() {
+        if (!window.indexedDB) return Promise.resolve(null);
+        return new Promise(function (resolve) {
+          var request;
+          try { request = indexedDB.open("semester-sathi-documents-v1", 1); }
+          catch (error) { resolve(null); return; }
+          request.onupgradeneeded = function () {
+            var db = request.result;
+            if (!db.objectStoreNames.contains("documents")) db.createObjectStore("documents", { keyPath: "id" });
+          };
+          request.onsuccess = function () { resolve(request.result); };
+          request.onerror = function () { resolve(null); };
+          request.onblocked = function () { resolve(null); };
+        });
+      }
+      function withDocumentStore(mode, operation) {
+        return documentDbPromise.then(function (db) {
+          if (!db) throw new Error("This browser could not open local file storage. Try a newer browser or the Android app.");
+          return new Promise(function (resolve, reject) {
+            var tx = db.transaction("documents", mode);
+            var store = tx.objectStore("documents");
+            var result;
+            try { result = operation(store); } catch (error) { reject(error); return; }
+            tx.oncomplete = function () { resolve(result && result.result !== undefined ? result.result : result); };
+            tx.onerror = function () { reject(tx.error || new Error("Could not save this file on the device.")); };
+            tx.onabort = function () { reject(tx.error || new Error("Could not save this file on the device.")); };
+          });
+        });
+      }
+      var supportedFileTypes = {
+        pdf: "application/pdf", doc: "application/msword", docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        dotx: "application/vnd.openxmlformats-officedocument.wordprocessingml.template", odt: "application/vnd.oasis.opendocument.text",
+        ppt: "application/vnd.ms-powerpoint", pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation", odp: "application/vnd.oasis.opendocument.presentation",
+        xls: "application/vnd.ms-excel", xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ods: "application/vnd.oasis.opendocument.spreadsheet",
+        txt: "text/plain", md: "text/markdown", csv: "text/csv", html: "text/html", htm: "text/html", xml: "application/xml", rtf: "application/rtf",
+        jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", epub: "application/epub+zip"
+      };
+      var fileAccept = ".pdf,.doc,.docx,.dotx,.odt,.ppt,.pptx,.odp,.xls,.xlsx,.ods,.txt,.md,.csv,.html,.htm,.xml,.rtf,.jpg,.jpeg,.png,.webp,.epub";
+      function extensionOf(name) { return String(name || "").toLowerCase().split(".").pop(); }
+      function documentMime(file) { return supportedFileTypes[extensionOf(file.name)] || file.type || "application/octet-stream"; }
+      function isAttachableType(file) { return extensionOf(file.name) !== "epub" && Object.prototype.hasOwnProperty.call(supportedFileTypes, extensionOf(file.name)); }
+      function formatFileSize(bytes) {
+        var size = Number(bytes || 0);
+        if (size < 1024) return size + " B";
+        if (size < 1024 * 1024) return (size / 1024).toFixed(0) + " KB";
+        return (size / (1024 * 1024)).toFixed(1) + " MB";
+      }
+      function saveLocalDocument(file) {
+        if (!file || !Object.prototype.hasOwnProperty.call(supportedFileTypes, extensionOf(file.name))) return Promise.reject(new Error("Choose a PDF, Office/OpenDocument file, text file, image, or EPUB."));
+        if (file.size > 50 * 1024 * 1024) return Promise.reject(new Error("Each saved file must be 50 MB or smaller."));
+        var meta = { id: uid(), name: String(file.name).slice(0, 180), type: documentMime(file), size: Number(file.size), addedAt: new Date().toISOString(), lastModified: Number(file.lastModified || 0) };
+        return withDocumentStore("readwrite", function (store) { store.put({ id: meta.id, name: meta.name, type: meta.type, size: meta.size, addedAt: meta.addedAt, blob: file }); }).then(function () {
+          state.files = Array.isArray(state.files) ? state.files : [];
+          state.files.unshift(meta);
+          saveState();
+          return meta;
+        });
+      }
+      function getLocalDocument(id) {
+        return withDocumentStore("readonly", function (store) { return store.get(id); });
+      }
+      function removeLocalDocument(id) {
+        return withDocumentStore("readwrite", function (store) { store.delete(id); }).then(function () {
+          state.files = state.files.filter(function (file) { return file.id !== id; });
+          chatAttachmentIds = chatAttachmentIds.filter(function (item) { return item !== id; });
+          state.chatDraftAttachmentIds = chatAttachmentIds.slice();
+          saveState();
+        });
+      }
       function persistGeminiApiKey(key) {
         if (window.Android && typeof window.Android.saveGeminiApiKey === "function") {
           try { return window.Android.saveGeminiApiKey(key) === "saved"; }
@@ -801,6 +912,17 @@
         var top = pageHeading("Your progress", "A simple view of syllabus coverage and the work you have completed.", "");
         return top + '<div class="progress-layout"><section class="panel"><div class="panel-head"><div><h2>Semester coverage</h2><p class="panel-subtitle">Calculated from your topic marks across all subjects.</p></div><span class="countdown-chip">' + pct + '%</span></div><div class="progress-track" style="height:11px"><div class="progress-fill" style="width:' + pct + '%"></div></div><p class="page-description" style="font-size:14px;margin-top:10px">' + done + ' of ' + total + ' topics are fully marked done. Update topic statuses in Subjects to change progress.</p><div class="progress-summary" style="margin-top:18px"><div class="progress-card"><div class="stat-label">Tasks completed</div><div class="progress-number">' + completedTasks + '</div><div class="progress-detail">across your semester</div></div><div class="progress-card"><div class="stat-label">Planned study time</div><div class="progress-number">' + Math.floor(plannedMinutes / 60) + 'h ' + plannedMinutes % 60 + 'm</div><div class="progress-detail">from tasks in this demo</div></div></div></section><section class="panel"><div class="panel-head"><div><h2>By subject</h2><p class="panel-subtitle">Progress reflects topics marked done.</p></div></div><div class="subject-list">' + bySubject + '</div></section></div>';
       }
+      function renderFilesPage() {
+        var files = Array.isArray(state.files) ? state.files : [];
+        var fileRows = files.map(function (file) {
+          var ext = extensionOf(file.name);
+          var attachable = isAttachableType(file);
+          return '<article class="file-card"><span class="file-kind" aria-hidden="true">' + esc(ext.slice(0, 5)) + '</span><div class="file-main"><div class="file-name" title="' + esc(file.name) + '">' + esc(file.name) + '</div><div class="file-meta">' + formatFileSize(file.size) + ' · Saved on this device · ' + (attachable ? 'Ready for Gemini' : 'EPUB saved locally; convert to PDF to use with Gemini') + '</div></div><div class="file-actions">' + (attachable ? '<button class="button" type="button" data-action="attach-library-file" data-file="' + esc(file.id) + '">Attach to AI chat</button>' : '') + '<button class="button" type="button" data-action="remove-library-file" data-file="' + esc(file.id) + '">Remove</button></div></article>';
+        }).join("");
+        var top = pageHeading("Your files", "Keep exam timetables, e-books, and study documents in this on-device library.", '<button class="button button-primary" type="button" data-action="add-library-files">+ Add files</button><input id="library-file-input" class="hidden" type="file" multiple accept="' + fileAccept + '">');
+        var empty = '<div class="empty-state">No files saved yet.<br>Add a timetable, PDF, e-book, or study document. Your files stay in this app on this device.</div>';
+        return top + '<section class="panel"><div class="panel-head"><div><h2>Saved files</h2><p class="panel-subtitle">' + files.length + ' file' + (files.length === 1 ? '' : 's') + ' stored locally</p></div><button class="button button-small" type="button" data-page="chat">Open AI chat</button></div><div class="file-list">' + (fileRows || empty) + '</div><p class="file-disclosure">Gemini reads PDFs, Office/OpenDocument files, text, and common images when you attach them and send a chat message. EPUB e-books are kept here locally but need to be converted to PDF before Gemini can read them. A file is sent directly to Google only when you send it in AI chat; the app has no upload server.</p></section>';
+      }
       function renderSettingsPage() {
         var profile = state.profile || {};
         var profileSummary = [profile.institutionType, profile.institutionName, profile.course, profile.yearLevel, profile.semester].filter(Boolean).join(" · ") || "Add your course and year details";
@@ -808,7 +930,7 @@
         var readyClass = apiKey ? " is-ready" : "";
         var keyCard = '<section class="settings-card"><div class="panel-head"><div><h2>Gemini AI chat & planner</h2><p class="panel-subtitle">Optional · uses Google Gemini 3.5 Flash-Lite</p></div><span id="gemini-status-badge" class="api-status' + readyClass + '"><span class="api-status-dot" aria-hidden="true"></span>' + (apiKey ? "Key saved on this device" : "No key saved") + '</span></div><p>Get a key from <a class="api-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>, then save it here. This model currently has a free tier, with request limits and project eligibility set by Google. After saving, open the AI Chat tab in the main navigation.</p><div class="api-key-row"><div class="field"><label for="gemini-api-key">Your Gemini API key</label><input id="gemini-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your personal API key here" aria-describedby="gemini-key-note"></div><button class="button button-primary" type="button" data-action="save-api-key">Save on this device</button>' + (apiKey ? '<button class="button" type="button" data-action="test-api">Test connection</button><button class="button" type="button" data-action="clear-api-key">Clear</button>' : '') + '</div><p id="gemini-key-note" class="field-help">The key stays on this device between launches. The Android app encrypts it with Android Keystore; the browser demo saves it in this browser. It is not included in your semester backup or synced. Use Clear to remove it.</p><div class="api-disclosure">Chat sends your message plus your subjects, exam dates, topic statuses, and task details to Google so it can answer and suggest changes. The app excludes your name and college. Free-tier prompts may be used by Google to improve its products. Use a project with billing disabled if you want to avoid accidental paid API usage, and check your project’s quota. Gemini needs internet; the offline planner remains available.</div></section>';
         var appearanceCard = '<section class="settings-card"><h2>Appearance</h2><p>Choose the theme that is easier to read. Your choice is saved on this device.</p><div class="settings-actions"><button class="button button-primary" type="button" data-action="toggle-theme">Switch to ' + (state.theme === "dark" ? "light" : "dark") + ' mode</button><span class="field-help" style="align-self:center">Current: ' + (state.theme === "dark" ? "Dark" : "Light") + '</span></div></section>';
-          return top + '<div class="settings-grid"><section class="settings-card"><h2>Student profile</h2><p>' + esc(profile.displayName ? profile.displayName + " · " : "") + esc(profileSummary) + '</p><div class="settings-actions"><button class="button" type="button" data-action="edit-profile">Edit profile</button></div></section>' + appearanceCard + keyCard + '<section class="settings-card"><h2>Local demo data</h2><p>Your profile, subjects, tasks, and progress are saved in this browser. They are not synced to another device. Export a JSON backup if you want to move your semester data.</p><div class="settings-actions"><button class="button button-primary" type="button" data-action="export">Export backup</button><button class="button" type="button" data-action="import">Import backup</button><input id="import-file" type="file" accept="application/json,.json" class="hidden"></div></section><section class="settings-card"><h2>Reset sample workspace</h2><p>Restore the sample subjects, exam dates, and tasks while keeping your student profile.</p><div class="settings-actions"><button class="button" type="button" data-action="reset">Restore sample data</button></div></section></div><div class="demo-note"><strong>Privacy</strong><span>AI Chat sends your message and study context only when you send it; the study planner sends selected subject details after you accept its notice. Your name and college details are excluded. Gemini requests need internet. All other study data stays on this device by default.</span></div>';
+          return top + '<div class="settings-grid"><section class="settings-card"><h2>Student profile</h2><p>' + esc(profile.displayName ? profile.displayName + " · " : "") + esc(profileSummary) + '</p><div class="settings-actions"><button class="button" type="button" data-action="edit-profile">Edit profile</button></div></section>' + appearanceCard + keyCard + '<section class="settings-card"><h2>Local demo data</h2><p>Your profile, subjects, tasks, and progress are saved in this browser. They are not synced to another device. Export a JSON backup if you want to move your semester data. Saved files stay in the Files section and are not included in the JSON backup.</p><div class="settings-actions"><button class="button button-primary" type="button" data-action="export">Export backup</button><button class="button" type="button" data-action="import">Import backup</button><input id="import-file" type="file" accept="application/json,.json" class="hidden"></div></section><section class="settings-card"><h2>Reset sample workspace</h2><p>Restore the sample subjects, exam dates, and tasks while keeping your student profile and saved files.</p><div class="settings-actions"><button class="button" type="button" data-action="reset">Restore sample data</button></div></section></div><div class="demo-note"><strong>Privacy</strong><span>AI Chat sends your message, study context, and any attached file directly to Google only when you send it. Your name and college details are excluded. Gemini requests need internet. All other study data and saved file copies stay on this device by default.</span></div>';
       }
       function chatStudyContext() {
         return {
@@ -831,6 +953,7 @@
         }
         if (action.type === "add_task") return "Add “" + action.title + "” for " + subjectLabel + " on " + action.date + " at " + action.time + " (" + action.duration_minutes + " min)";
         if (action.type === "remove_task") return "Remove task “" + action.title + "” for " + subjectLabel + " on " + dateLabel(action.date);
+        if (action.type === "set_exam_details") return "Update exam details for “" + subjectLabel + "”" + (action.examDate ? " to " + dateLabel(action.examDate) : "") + (action.examTime ? " at " + action.examTime : "") + (action.room ? " in " + action.room : "");
         if (action.type === "set_topic_status") return "Mark “" + action.topic + "” in " + subjectLabel + " as " + action.status;
         if (action.type === "add_topic") return "Add “" + action.topic + "” to " + subjectLabel;
         if (action.type === "remove_topic") return "Remove “" + action.topic + "” from " + subjectLabel;
@@ -839,6 +962,7 @@
       function renderChatMessage(message, index) {
         var role = message.role === "user" ? "user" : "assistant";
         var html = '<article class="chat-message ' + role + (message.error ? ' chat-error' : '') + '"><div class="chat-message-label">' + (role === "user" ? "You" : "Semester Sathi AI") + '</div><div>' + esc(message.text) + '</div>';
+        if (role === "user" && Array.isArray(message.files) && message.files.length) html += '<div class="chat-file-list">' + message.files.map(function (file) { return '<span class="chat-file-tag">▤ ' + esc(file.name) + '</span>'; }).join("") + '</div>';
         if (role === "assistant" && message.pending && Array.isArray(message.actions) && message.actions.length) {
           html += '<div class="chat-pending"><p class="chat-pending-title">Review these app changes</p><ul class="chat-proposal-list">' + message.actions.map(function (action) { return '<li>' + esc(chatActionDescription(action)) + '</li>'; }).join("") + '</ul><div class="chat-pending-actions"><button class="button button-primary button-small" type="button" data-action="apply-chat-actions" data-message-index="' + index + '">Apply changes</button><button class="button button-small" type="button" data-action="dismiss-chat-actions" data-message-index="' + index + '">Dismiss</button></div></div>';
         } else if (role === "assistant" && message.applied) {
@@ -849,7 +973,7 @@
         return html + '</article>';
       }
       function chatEmptyMarkup() {
-        return '<div class="chat-empty"><div class="chat-empty-mark" aria-hidden="true">✦</div><h2>Your study assistant is ready</h2><p>Ask about a subject, request a revision plan, or tell it to add a study task. It will show proposed app changes here for you to approve.</p>' + (!apiKey ? '<button class="button button-primary" style="margin:16px auto 0" type="button" data-page="settings">Add API key in Data & settings</button>' : '') + '</div>';
+        return '<div class="chat-empty"><div class="chat-empty-mark" aria-hidden="true">✦</div><h2>Your study assistant is ready</h2><p>Ask about a subject, attach an exam timetable or study document, and request a revision plan. Gemini can propose subjects and study tasks for you to review.</p>' + (!apiKey ? '<button class="button button-primary" style="margin:16px auto 0" type="button" data-page="settings">Add API key in Data & settings</button>' : '') + '</div>';
       }
       function chatFeedMarkup() {
         var content = state.chatMessages.length ? state.chatMessages.map(renderChatMessage).join("") : chatEmptyMarkup();
@@ -867,15 +991,111 @@
       }
       function updateChatBusyUI() {
         var button = document.querySelector("#chat-form button[type='submit']");
-        if (button) { button.disabled = chatLoading; button.textContent = chatLoading ? "Thinking…" : "Send"; button.setAttribute("aria-label", chatLoading ? "Gemini is thinking" : "Send message"); }
+        if (button) { button.disabled = chatLoading || !apiKey; button.textContent = chatLoading ? "Thinking…" : "Send"; button.setAttribute("aria-label", chatLoading ? "Gemini is thinking" : "Send message"); }
         var status = document.getElementById("chat-api-status");
         if (status) status.textContent = chatLoading ? "Gemini is replying…" : apiKey ? "Gemini key saved · ready when online" : "Add a Gemini key to start chatting";
+      }
+      function chatAttachmentMarkup() {
+        var selected = chatAttachmentIds.map(function (id) { return state.files.find(function (file) { return file.id === id; }); }).filter(Boolean);
+        return selected.map(function (file) { return '<span class="chat-attachment-chip"><span>' + esc(file.name) + ' · ' + formatFileSize(file.size) + '</span><button type="button" data-action="remove-chat-attachment" data-file="' + esc(file.id) + '" aria-label="Remove ' + esc(file.name) + ' from this message">×</button></span>'; }).join("");
+      }
+      function refreshChatAttachments() {
+        var root = document.getElementById("chat-attachments");
+        if (root) root.innerHTML = chatAttachmentMarkup();
+      }
+      async function handleDocumentSelection(input, attachToChat) {
+        var chosen = Array.prototype.slice.call(input && input.files || []);
+        if (input) input.value = "";
+        if (!chosen.length) return;
+        var added = 0, unsupported = 0;
+        for (var i = 0; i < chosen.length; i++) {
+          var selected = chosen[i];
+          var existing = state.files.find(function (item) { return item.name === selected.name && Number(item.size) === selected.size && Number(item.lastModified || 0) === Number(selected.lastModified || 0); });
+          var meta;
+          try { meta = existing || await saveLocalDocument(selected); }
+          catch (error) { showToast(error && error.message || "Could not save that file on this device."); continue; }
+          added++;
+          if (attachToChat) {
+            if (!isAttachableType(selected)) { unsupported++; continue; }
+            if (!chatAttachmentIds.includes(meta.id) && chatAttachmentIds.length < 5) chatAttachmentIds.push(meta.id);
+          }
+        }
+        state.chatDraftAttachmentIds = chatAttachmentIds.slice();
+        saveState();
+        if (state.page === "files") render(); else refreshChatAttachments();
+        if (unsupported) showToast("EPUB saved in Files. Convert it to PDF before attaching it to Gemini.");
+        else if (attachToChat && chatAttachmentIds.length >= 5) showToast("Up to five files can be attached to one message.");
+        else showToast(added + " file" + (added === 1 ? "" : "s") + " saved on this device.");
+      }
+      function attachLibraryFile(fileId) {
+        var file = state.files.find(function (item) { return item.id === fileId; });
+        if (!file) { showToast("That saved file is no longer available."); return; }
+        if (!isAttachableType(file)) { showToast("EPUB files stay in your library; convert this e-book to PDF to use it with Gemini."); return; }
+        if (!chatAttachmentIds.includes(fileId) && chatAttachmentIds.length < 5) chatAttachmentIds.push(fileId);
+        state.chatDraftAttachmentIds = chatAttachmentIds.slice();
+        setPage("chat");
+        refreshChatAttachments();
+      }
+      function openRemoveFileModal(fileId) {
+        var file = state.files.find(function (item) { return item.id === fileId; });
+        if (!file) return;
+        var body = '<p class="modal-copy">This removes “' + esc(file.name) + '” from this device’s Files library.</p>';
+        var actions = '<div class="modal-actions"><button class="button" type="button" data-action="close-modal">Keep file</button><button class="button" type="button" data-action="confirm-remove-library-file" data-file="' + esc(file.id) + '" style="border-color:var(--red);color:var(--red)">Remove file</button></div>';
+        modalFrame("Remove saved file?", "This cannot be undone from the app.", body, actions);
+      }
+      async function blobToBase64(blob) {
+        var bytes = new Uint8Array(await blob.arrayBuffer());
+        var binary = "";
+        for (var offset = 0; offset < bytes.length; offset += 32768) binary += String.fromCharCode.apply(null, bytes.subarray(offset, Math.min(offset + 32768, bytes.length)));
+        return btoa(binary);
+      }
+      async function uploadLargeDocument(file) {
+        var mime = file.type || "application/octet-stream";
+        var start = await fetch("https://generativelanguage.googleapis.com/upload/v1beta/files", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey,
+            "X-Goog-Upload-Protocol": "resumable",
+            "X-Goog-Upload-Command": "start",
+            "X-Goog-Upload-Header-Content-Length": String(file.size),
+            "X-Goog-Upload-Header-Content-Type": mime
+          },
+          body: JSON.stringify({ file: { display_name: file.name } })
+        });
+        var startText = await start.text(), startData = {};
+        try { startData = startText ? JSON.parse(startText) : {}; } catch (e) { }
+        if (!start.ok) throw new Error(googleErrorMessage(start.status, startData));
+        var uploadUrl = start.headers.get("x-goog-upload-url");
+        if (!uploadUrl) throw new Error("Google did not return a file upload session. Please try a smaller file.");
+        var uploadedResponse = await fetch(uploadUrl, { method: "POST", headers: { "X-Goog-Upload-Offset": "0", "X-Goog-Upload-Command": "upload, finalize", "Content-Type": mime }, body: file.blob });
+        var uploadedText = await uploadedResponse.text(), uploadedData = {};
+        try { uploadedData = uploadedText ? JSON.parse(uploadedText) : {}; } catch (e) { }
+        if (!uploadedResponse.ok) throw new Error(googleErrorMessage(uploadedResponse.status, uploadedData));
+        var uploaded = uploadedData.file || uploadedData;
+        if (!uploaded || !uploaded.uri) throw new Error("Google accepted the file but did not return a readable file reference.");
+        for (var attempt = 0; uploaded.state && uploaded.state !== "ACTIVE" && attempt < 15; attempt++) {
+          if (uploaded.state === "FAILED") throw new Error("Google could not process “" + file.name + "”. Try a PDF or a smaller file.");
+          await new Promise(function (resolve) { setTimeout(resolve, 900); });
+          var checkResponse = await fetch("https://generativelanguage.googleapis.com/v1beta/" + uploaded.name, { headers: { "x-goog-api-key": apiKey } });
+          if (!checkResponse.ok) break;
+          var check = await checkResponse.json();
+          uploaded = check.file || check;
+        }
+        if (uploaded.state && uploaded.state !== "ACTIVE") throw new Error("Google is still processing “" + file.name + "”. Try sending it again in a moment.");
+        return { type: extensionOf(file.name).match(/^(jpg|jpeg|png|webp)$/) ? "image" : "document", uri: uploaded.uri, mime_type: mime };
+      }
+      async function toGeminiFileInput(file, totalSize) {
+        var mime = file.type || "application/octet-stream";
+        var kind = extensionOf(file.name).match(/^(jpg|jpeg|png|webp)$/) ? "image" : "document";
+        if (file.size > 12 * 1024 * 1024 || totalSize > 18 * 1024 * 1024) return uploadLargeDocument(file);
+        return { type: kind, data: await blobToBase64(file.blob), mime_type: mime };
       }
       function renderChatPage() {
         var top = pageHeading("Chat with your study AI", "Ask for explanations, revision advice, or changes to your study schedule.", '<button class="button button-small" type="button" data-action="clear-chat"' + (state.chatMessages.length ? '' : ' disabled') + '>Clear chat</button>');
         var status = apiKey ? "Gemini key saved · ready when online" : "Add a Gemini key to start chatting";
         var feedContent = chatFeedMarkup();
-        var form = apiKey ? '<form id="chat-form" class="chat-compose"><div class="chat-compose-row"><textarea id="chat-input" name="message" maxlength="1200" placeholder="Ask about your subjects, or request a study task…" aria-label="Message Semester Sathi AI" required></textarea><button class="button button-primary" type="submit" aria-label="' + (chatLoading ? 'Gemini is thinking' : 'Send message') + '"' + (chatLoading ? ' disabled' : '') + '>' + (chatLoading ? 'Thinking…' : 'Send') + '</button></div><div class="chat-compose-note"><span>Your message and study context are sent to Google using your key. Profile and college details are excluded.</span><span id="chat-api-status" class="chat-api-status" role="status">' + (chatLoading ? 'Gemini is replying…' : status) + '</span></div></form>' : '<div class="chat-compose"><div class="chat-toolbar"><span class="field-help">The key you save in Data & settings unlocks Gemini chat here.</span><button class="button button-primary" type="button" data-page="settings">Open Data & settings</button></div></div>';
+        var form = '<form id="chat-form" class="chat-compose"><input id="chat-file-input" class="hidden" type="file" multiple accept="' + fileAccept + '"><div id="chat-attachments" class="chat-attachments">' + chatAttachmentMarkup() + '</div><div class="chat-upload-row"><button class="button" type="button" data-action="pick-chat-files">＋ Attach files</button><button class="button" type="button" data-page="files">Browse saved files</button><span class="field-help">PDF, Office, text, images · up to 50 MB each</span></div><div class="chat-compose-row"><textarea id="chat-input" name="message" maxlength="1200" placeholder="Ask about an attached timetable or your subjects…" aria-label="Message Semester Sathi AI"></textarea><button class="button button-primary" type="submit" aria-label="' + (chatLoading ? 'Gemini is thinking' : 'Send message') + '"' + (chatLoading || !apiKey ? ' disabled' : '') + '>' + (chatLoading ? 'Thinking…' : 'Send') + '</button></div><div class="chat-compose-note"><small>' + (apiKey ? 'When you send, your message, study context, and attached files go directly to Google using your key. Local copies remain in Files on this device. Large files may be temporarily stored by Google while being processed.' : 'Save your Google AI Studio key under your profile first. You can still add and save files on this device.') + '</small><span id="chat-api-status" class="chat-api-status" role="status">' + (chatLoading ? 'Gemini is replying…' : status) + '</span></div></form>';
         return top + '<div class="chat-toolbar"><span class="chat-api-status">' + status + '</span></div><section class="panel chat-shell" aria-label="AI chat"><div id="chat-feed" class="chat-feed" aria-live="polite">' + feedContent + '</div>' + form + '</section>';
       }
       function openOnboarding(editing) {
@@ -918,6 +1138,8 @@
         document.getElementById("onboarding-root").innerHTML = "";
         var initial = (state.profile.displayName || "S").trim().charAt(0).toUpperCase() || "S";
         document.getElementById("avatar-initial").textContent = initial;
+        document.getElementById("profile-menu-name").textContent = state.profile.displayName || "Student profile";
+        document.getElementById("profile-menu-summary").textContent = [state.profile.course, state.profile.yearLevel, state.profile.semester].filter(Boolean).join(" · ") || "Your study details";
         refreshApiStatus();
         var page = pageNames[state.page] ? state.page : "overview";
         state.page = page;
@@ -928,7 +1150,7 @@
         });
         document.getElementById("top-caption").textContent = pageNames[page][0] + " · " + pageNames[page][1];
         var html = page === "overview" ? renderOverview() : page === "calendar" ? renderCalendarPage() :
-          page === "subjects" ? renderSubjectsPage() : page === "tasks" ? renderTasksPage() : page === "chat" ? renderChatPage() :
+          page === "subjects" ? renderSubjectsPage() : page === "tasks" ? renderTasksPage() : page === "files" ? renderFilesPage() : page === "chat" ? renderChatPage() :
           page === "progress" ? renderProgressPage() : renderSettingsPage();
         document.getElementById("main-content").innerHTML = html;
         if (page === "chat") {
@@ -945,8 +1167,21 @@
       function setPage(page) {
         if (!pageNames[page]) return;
         state.page = page;
+        setNavOpen(false);
+        setProfileMenuOpen(false);
         saveState();
         render();
+      }
+      function setNavOpen(open) {
+        var sidebar = document.querySelector(".sidebar");
+        if (sidebar) sidebar.classList.toggle("is-open", !!open);
+        document.querySelectorAll('[data-action="toggle-nav"]').forEach(function (button) { button.setAttribute("aria-expanded", open ? "true" : "false"); });
+      }
+      function setProfileMenuOpen(open) {
+        var menu = document.getElementById("profile-menu");
+        var button = document.getElementById("avatar-initial");
+        if (menu) menu.hidden = !open;
+        if (button) button.setAttribute("aria-expanded", open ? "true" : "false");
       }
       function showToast(message) {
         var root = document.getElementById("toast-root");
@@ -1024,7 +1259,7 @@
       function normalizeChatActions(actions) {
         if (!Array.isArray(actions)) return [];
         var accepted = [];
-        actions.slice(0, 5).forEach(function (raw) {
+        actions.slice(0, 20).forEach(function (raw) {
           if (!raw || typeof raw !== "object") return;
           var action = { type: String(raw.type || "").trim() };
           var subjectLabel = String(raw.subject || "").trim();
@@ -1063,6 +1298,26 @@
             var removeTask = state.tasks.find(function (item) { return item.id === taskId; });
             if (!removeTask) return;
             accepted.push({ type: action.type, taskId: removeTask.id, title: removeTask.title, subject: subjectName(removeTask.subjectId), date: removeTask.date });
+            return;
+          }
+          if (action.type === "set_exam_details") {
+            if (!subject) return;
+            var examChanges = { type: action.type, subject: subject.name, subjectId: subject.id };
+            var updateDate = String(raw.exam_date || "").trim();
+            if (updateDate) {
+              if (!/^\d{4}-\d{2}-\d{2}$/.test(updateDate) || localISO(parseLocal(updateDate)) !== updateDate) return;
+              examChanges.examDate = updateDate;
+            }
+            var updateTime = String(raw.exam_time || "").trim();
+            if (updateTime) {
+              if (!/^\d{2}:\d{2}$/.test(updateTime) || Number(updateTime.slice(0, 2)) > 23 || Number(updateTime.slice(3)) > 59) return;
+              examChanges.examTime = updateTime;
+            }
+            var updateRoom = String(raw.room || "").trim().slice(0, 50);
+            var updateCode = String(raw.code || "").trim().slice(0, 20);
+            if (updateRoom) examChanges.room = updateRoom;
+            if (updateCode) examChanges.code = updateCode;
+            if (Object.keys(examChanges).length > 2) accepted.push(examChanges);
             return;
           }
           if (!subject) return;
@@ -1167,20 +1422,43 @@
         if (!apiKey) { showToast("Save your Gemini key in Data & settings first."); return; }
         var input = document.getElementById("chat-input");
         var userText = input && input.value.trim();
-        if (!userText || chatLoading) return;
-        state.chatMessages.push({ role: "user", text: userText });
+        var selectedIds = chatAttachmentIds.slice(0, 5);
+        if ((!userText && !selectedIds.length) || chatLoading) return;
+        var selectedMeta = selectedIds.map(function (id) { return state.files.find(function (file) { return file.id === id; }); }).filter(Boolean);
+        if (selectedMeta.length !== selectedIds.length) { showToast("A selected file is missing from this device. Add it again from Files."); return; }
+        if (selectedMeta.some(function (file) { return !isAttachableType(file); })) { showToast("EPUB e-books are saved locally but must be converted to PDF before Gemini can read them."); return; }
+        var totalFileSize = selectedMeta.reduce(function (sum, file) { return sum + Number(file.size || 0); }, 0);
+        if (totalFileSize > 50 * 1024 * 1024) { showToast("Choose up to 50 MB of files for one Gemini message."); return; }
+        var storedFiles = [];
+        try {
+          for (var fileIndex = 0; fileIndex < selectedIds.length; fileIndex++) {
+            var stored = await getLocalDocument(selectedIds[fileIndex]);
+            if (!stored || !stored.blob) throw new Error("Could not find “" + selectedMeta[fileIndex].name + "” in local storage. Add the file again.");
+            storedFiles.push(stored);
+          }
+        } catch (storageError) { showToast(storageError.message || "Could not read the saved file from this device."); return; }
+        if (!userText && selectedMeta.length) userText = "Please read the attached study document. If it is an exam timetable, extract the subjects and exact dates, then propose a realistic revision plan with subject and task changes I can review.";
+        state.chatMessages.push({ role: "user", text: userText, files: selectedMeta.map(function (file) { return { id: file.id, name: file.name, type: file.type, size: file.size }; }) });
         state.chatMessages = state.chatMessages.slice(-60);
         chatLoading = true;
         input.value = "";
+        chatAttachmentIds = [];
+        state.chatDraftAttachmentIds = [];
         saveState();
         updateChatBusyUI();
         refreshChatFeed(true);
         var recent = state.chatMessages.slice(-12).map(function (message) {
-          return (message.role === "user" ? "Student" : "Assistant") + ": " + message.text;
+          var attached = Array.isArray(message.files) && message.files.length ? " [Attached files: " + message.files.map(function (file) { return file.name; }).join(", ") + "]" : "";
+          return (message.role === "user" ? "Student" : "Assistant") + ": " + message.text + attached;
         }).join("\n");
-        var prompt = "You are Semester Sathi, a concise and supportive study assistant. Answer questions naturally using the study context. App changes are proposals only; never claim a change is applied unless the student approves it in the app. Supported actions: add_subject, remove_subject, add_task, remove_task, set_topic_status, add_topic. A subject needs only a name. To add one, use add_subject with name; exam_date (YYYY-MM-DD), exam_time (HH:MM), code, room, and topics are optional. If the student gives only a subject name, propose it immediately with no exam date. Never propose a duplicate subject. To remove a subject, use remove_subject and its exact existing name from context. To remove a task, use remove_task and the exact task_id from context that matches the student's request; never guess an ID or choose among ambiguous tasks without asking. To add a task, use add_task with title and an existing subject name when relevant; if the student gives no date/time/duration, use today, 16:00, and 45 minutes. Dates are YYYY-MM-DD, times HH:MM (24-hour), and duration is 5 to 240 minutes. Use exact subject/topic names for topic actions. Suggest at most 5 valid actions. If the requested target is unclear, ask a brief question and return no action for it. Never output code or arbitrary commands. Always return JSON with a helpful reply and an actions array. Current local study context (no student name or college details): " + JSON.stringify(chatStudyContext()) + "\n\nRecent conversation:\n" + recent;
+        var prompt = "You are Semester Sathi, a concise and supportive study assistant. Read any attached documents before answering and use their names as references. Treat an uploaded timetable as source material: copy subject names, dates, times, and rooms accurately; never guess missing details. When the student asks to build a plan from a timetable, propose new subjects with add_subject, update matching existing subjects with set_exam_details, and add practical revision tasks before exam dates where the available time allows. Do not mark any app change as applied until the student approves it. Supported actions: add_subject, set_exam_details, remove_subject, add_task, remove_task, set_topic_status, add_topic. A subject needs only a name. For add_subject, exam_date (YYYY-MM-DD), exam_time (HH:MM), code, room, and topics are optional. Do not duplicate an existing subject; use set_exam_details to update a matching subject's exam information. To remove a subject, use its exact name from local context. To remove a task, use the exact task_id from context; never guess an ID. To add a task, use title and an existing subject name when relevant; default missing date/time/duration to today, 16:00, and 45 minutes. Dates are YYYY-MM-DD, times HH:MM (24-hour), and duration is 5 to 240 minutes. Use exact topic names. Return only well-grounded changes and no more than 20 actions at a time. If a date or target is unclear, ask a short question and return no action for it. Never output code or arbitrary commands. Always return JSON with a helpful reply and an actions array. Current local study context (no student name or college details): " + JSON.stringify(chatStudyContext()) + "\n\nRecent conversation:\n" + recent;
         try {
-          var data = await fetchGeminiInteraction(prompt, chatActionSchema());
+          var modelInput = [{ type: "text", text: prompt }];
+          for (var docIndex = 0; docIndex < storedFiles.length; docIndex++) {
+            modelInput.push({ type: "text", text: "Attached study file: " + storedFiles[docIndex].name });
+            modelInput.push(await toGeminiFileInput(storedFiles[docIndex], totalFileSize));
+          }
+          var data = await fetchGeminiInteraction(modelInput, chatActionSchema());
           var rawText = interactionText(data).trim();
           if (!rawText) throw new Error("Gemini returned an empty reply. Please try again.");
           var result;
@@ -1232,6 +1510,14 @@
             scheduleNativeReminder(task);
           } else if (action.type === "remove_task") {
             removeTaskData(action.taskId);
+          } else if (action.type === "set_exam_details") {
+            var examSubject = subjectById(action.subjectId);
+            if (examSubject) {
+              if (action.examDate) examSubject.examDate = action.examDate;
+              if (action.examTime) examSubject.examTime = action.examTime;
+              if (action.room) examSubject.room = action.room;
+              if (action.code) examSubject.code = action.code;
+            }
           } else if (action.type === "set_topic_status") {
             var statusSubject = subjectById(action.subjectId);
             var statusTopic = statusSubject && statusSubject.topics.find(function (item) { return item.name === action.topic; });
@@ -1420,7 +1706,8 @@
         modalFrame("Remove this chapter or lesson?", "This only removes it from the subject syllabus.", body, actions);
       }
       function exportBackup() {
-        var blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+        var backup = Object.assign({}, state, { files: [], chatDraftAttachmentIds: [] });
+        var blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
         var url = URL.createObjectURL(blob);
         var link = document.createElement("a");
         link.href = url; link.download = "semester-sathi-backup.json";
@@ -1438,6 +1725,9 @@
             if (!Array.isArray(imported.chatMessages)) imported.chatMessages = [];
             imported.chatMessages = imported.chatMessages.filter(function (message) { return message && (message.role === "user" || message.role === "assistant") && typeof message.text === "string"; }).slice(-60);
             imported.subjects.forEach(function (subject) { delete subject.progressOverride; });
+            imported.files = state.files || [];
+            imported.chatDraftAttachmentIds = [];
+            chatAttachmentIds = [];
             state = imported;
             saveState(); render(); showToast("Backup restored in this browser.");
           } catch (e) { showToast("That file is not a valid Semester Sathi backup."); }
@@ -1446,8 +1736,11 @@
       }
       function resetDemo() {
         var profile = state.profile;
+        var savedFiles = state.files || [];
         state = sampleState();
         state.profile = profile;
+        state.files = savedFiles;
+        chatAttachmentIds = [];
         state.semester = profile && (profile.semester || profile.yearLevel) || state.semester;
         saveState();
         closeModal();
@@ -1456,6 +1749,8 @@
       }
 
       document.addEventListener("click", function (event) {
+        if (!event.target.closest(".sidebar") && !event.target.closest(".mobile-brand")) setNavOpen(false);
+        if (!event.target.closest(".profile-wrap")) setProfileMenuOpen(false);
         var pageButton = event.target.closest("[data-page]");
         if (pageButton) { setPage(pageButton.dataset.page); return; }
         var dateButton = event.target.closest("[data-date]");
@@ -1481,7 +1776,22 @@
         var action = event.target.closest("[data-action]");
         if (!action) return;
         var name = action.dataset.action;
-        if (name === "build-plan") openPlanModal();
+        if (name === "toggle-nav") setNavOpen(!document.querySelector(".sidebar").classList.contains("is-open"));
+        else if (name === "toggle-profile-menu") setProfileMenuOpen(document.getElementById("profile-menu").hidden);
+        else if (name === "pick-chat-files") document.getElementById("chat-file-input").click();
+        else if (name === "add-library-files") document.getElementById("library-file-input").click();
+        else if (name === "attach-library-file") attachLibraryFile(action.dataset.file);
+        else if (name === "remove-chat-attachment") {
+          chatAttachmentIds = chatAttachmentIds.filter(function (id) { return id !== action.dataset.file; });
+          state.chatDraftAttachmentIds = chatAttachmentIds.slice();
+          saveState(); refreshChatAttachments();
+        }
+        else if (name === "remove-library-file") openRemoveFileModal(action.dataset.file);
+        else if (name === "confirm-remove-library-file") {
+          var removedFileName = (state.files.find(function (file) { return file.id === action.dataset.file; }) || {}).name || "File";
+          removeLocalDocument(action.dataset.file).then(function () { closeModal(); render(); showToast("“" + removedFileName + "” removed from this device."); }).catch(function (error) { showToast(error && error.message || "Could not remove that file."); });
+        }
+        else if (name === "build-plan") openPlanModal();
         else if (name === "generate-offline") generateOfflinePlan();
         else if (name === "generate-ai") generateGeminiPlan(document.getElementById("generate-gemini-button"));
         else if (name === "test-api") testGeminiConnection(action);
@@ -1494,7 +1804,7 @@
           state.chatMessages = [];
           saveState(); render(); showToast("Chat history cleared from this device.");
         }
-        else if (name === "edit-profile") openOnboarding(true);
+        else if (name === "edit-profile") { setProfileMenuOpen(false); openOnboarding(true); }
         else if (name === "cancel-profile") render();
         else if (name === "save-api-key") {
           var enteredKey = document.getElementById("gemini-api-key").value.trim();
@@ -1561,6 +1871,8 @@
         if (event.target.id === "chat-form") { event.preventDefault(); sendGeminiChat(); }
       });
       document.addEventListener("change", function (event) {
+        if (event.target.id === "chat-file-input") { handleDocumentSelection(event.target, true); return; }
+        if (event.target.id === "library-file-input") { handleDocumentSelection(event.target, false); return; }
         var check = event.target.closest("[data-task-check]");
         if (check) {
           var task = state.tasks.find(function (item) { return item.id === check.dataset.taskCheck; });
