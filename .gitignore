@@ -1,0 +1,18 @@
+# Android / Gradle output
+.gradle/
+**/.gradle/
+build/
+**/build/
+.idea/
+local.properties
+
+# Signing keys and local secrets
+*.jks
+*.keystore
+debug.keystore
+*.properties.local
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+*.iml

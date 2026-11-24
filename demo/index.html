@@ -1,0 +1,1373 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f7f5">
+  <title>Semester Sathi — Planner Demo</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f7f5;
+      --surface: #ffffff;
+      --surface-soft: #f8faf9;
+      --ink: #17231d;
+      --muted: #64736b;
+      --line: #e3eae5;
+      --green: #24694f;
+      --green-dark: #194c39;
+      --green-soft: #e7f3ec;
+      --blue: #4779a0;
+      --blue-soft: #eaf2f8;
+      --amber: #a76522;
+      --amber-soft: #fff1df;
+      --red: #a94343;
+      --red-soft: #fbeaea;
+      --shadow: 0 12px 32px rgba(29, 57, 43, .07);
+      --radius: 18px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #111a16;
+      --surface: #1a2620;
+      --surface-soft: #202e27;
+      --ink: #e7efe9;
+      --muted: #a4b3aa;
+      --line: #33443a;
+      --green: #4eaa7e;
+      --green-dark: #9ad5b5;
+      --green-soft: #263e32;
+      --blue: #84b5d9;
+      --blue-soft: #243644;
+      --amber: #e4b16f;
+      --amber-soft: #443523;
+      --red: #e18b8b;
+      --red-soft: #442d2d;
+      --shadow: 0 12px 32px rgba(0, 0, 0, .24);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--bg); font-size: 16px; }
+    button, input, select, textarea { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid rgba(36, 105, 79, .26);
+      outline-offset: 2px;
+    }
+    .app-shell { display: grid; grid-template-columns: 244px minmax(0, 1fr); min-height: 100vh; }
+    .sidebar {
+      position: sticky; top: 0; display: flex; flex-direction: column; height: 100vh;
+      padding: 24px 16px 18px; background: var(--surface); border-right: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: center; gap: 11px; padding: 0 10px; margin-bottom: 32px; }
+    .brand-mark {
+      display: grid; width: 40px; height: 40px; place-items: center; border-radius: 13px;
+      background: var(--green); color: #fff; font-size: 19px; font-weight: 750; letter-spacing: -.05em;
+    }
+    .brand-name { font-size: 16px; font-weight: 750; letter-spacing: -.035em; }
+    .brand-subtitle { margin-top: 2px; color: var(--muted); font-size: 12px; }
+    .side-label { padding: 0 12px; margin: 0 0 9px; color: #819087; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .nav-list { display: grid; gap: 5px; }
+    .nav-button {
+      display: flex; align-items: center; gap: 12px; width: 100%; min-height: 46px; padding: 9px 12px;
+      border: 0; border-radius: 12px; background: transparent; text-align: left; color: #59685f;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .nav-button:hover { background: var(--surface-soft); color: var(--ink); }
+    .nav-button[aria-current="page"] { background: var(--green-soft); color: var(--green-dark); }
+    .nav-glyph { display: grid; width: 23px; height: 23px; place-items: center; color: currentColor; font-size: 17px; line-height: 1; }
+    .sidebar-spacer { flex: 1; }
+    .local-badge {
+      display: flex; align-items: flex-start; gap: 10px; padding: 13px 12px;
+      border: 1px solid var(--line); border-radius: 14px; background: var(--surface-soft);
+    }
+    .local-icon { width: 9px; height: 9px; flex: 0 0 auto; margin-top: 5px; border-radius: 50%; background: #35966c; }
+    .local-title { font-size: 13px; font-weight: 700; }
+    .local-copy { margin-top: 3px; color: var(--muted); font-size: 12px; line-height: 1.4; }
+    .workspace { min-width: 0; }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      min-height: 80px; padding: 15px clamp(22px, 4vw, 54px); background: rgba(255,255,255,.8);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .mobile-brand { display: none; }
+    .top-caption { color: var(--muted); font-size: 13px; }
+    .topbar-actions { display: flex; align-items: center; gap: 10px; }
+    .avatar { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 50%; background: #dcece3; color: var(--green-dark); font-size: 13px; font-weight: 700; }
+    .main-content { width: min(100%, 1440px); margin: 0 auto; padding: 30px clamp(22px, 4vw, 54px) 42px; }
+    .page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-bottom: 24px; }
+    .eyebrow { margin: 0 0 7px; color: var(--green); font-size: 12px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(26px, 3vw, 34px); line-height: 1.15; letter-spacing: -.045em; }
+    h2 { margin: 0; font-size: 18px; letter-spacing: -.025em; }
+    h3 { margin: 0; font-size: 15px; letter-spacing: -.015em; }
+    p { margin: 0; }
+    .page-description { margin-top: 8px; color: var(--muted); font-size: 15px; line-height: 1.5; }
+    .heading-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 9px; }
+    .button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 9px 14px;
+      border: 1px solid var(--line); border-radius: 11px; background: #fff; color: var(--ink);
+      font-size: 14px; font-weight: 650; text-decoration: none; cursor: pointer; transition: transform .15s ease, background .15s ease;
+    }
+    .button:hover { background: var(--surface-soft); }
+    .button:active { transform: translateY(1px); }
+    .button-primary { border-color: var(--green); background: var(--green); color: #fff; }
+    .button-primary:hover { border-color: var(--green-dark); background: var(--green-dark); color: #fff; }
+    .button-quiet { border-color: transparent; background: transparent; color: var(--muted); }
+    .button-small { min-height: 35px; padding: 7px 10px; font-size: 13px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; margin-bottom: 18px; }
+    .stat-card, .panel, .exam-card, .subject-card, .progress-card, .settings-card {
+      border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow);
+    }
+    .stat-card { min-height: 116px; padding: 18px 20px; }
+    .stat-label { color: var(--muted); font-size: 13px; font-weight: 600; }
+    .stat-value { margin-top: 11px; font-size: 25px; font-weight: 760; letter-spacing: -.04em; }
+    .stat-foot { margin-top: 5px; color: var(--muted); font-size: 13px; }
+    .dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(330px, .85fr); gap: 18px; align-items: start; }
+    .panel { min-width: 0; padding: 20px; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 17px; }
+    .panel-subtitle { margin-top: 5px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .month-controls { display: flex; align-items: center; gap: 7px; }
+    .month-controls strong { min-width: 142px; text-align: center; font-size: 15px; }
+    .month-nav { min-height: 36px; padding: 6px 9px; font-size: 12px; }
+    .calendar-weekdays, .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+    .calendar-weekdays { margin: 0 0 7px; color: #78857d; text-align: center; font-size: 12px; font-weight: 650; }
+    .calendar-weekdays span { padding: 7px 0; }
+    .calendar-day {
+      position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+      min-width: 0; min-height: 57px; padding: 8px 3px 6px; border: 1px solid transparent; border-radius: 12px;
+      background: transparent; color: var(--ink); font-size: 13px; cursor: pointer;
+    }
+    .calendar-day:hover { border-color: var(--line); background: var(--surface-soft); }
+    .calendar-day[aria-pressed="true"] { border-color: var(--green); background: var(--green); color: #fff; font-weight: 750; }
+    .calendar-day.is-other-month { color: #a5aea8; }
+    .calendar-day.is-today:not([aria-pressed="true"]) { border-color: #a8cdb8; color: var(--green-dark); font-weight: 750; }
+    .day-dots { display: flex; gap: 3px; min-height: 6px; margin-top: 7px; }
+    .day-dot { width: 5px; height: 5px; border-radius: 50%; background: #4d9b72; }
+    .day-dot.exam { background: #638bb3; }
+    .calendar-day[aria-pressed="true"] .day-dot { background: #fff; }
+    .calendar-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 14px; color: var(--muted); font-size: 13px; }
+    .legend-item { display: inline-flex; align-items: center; gap: 7px; }
+    .legend-dot { width: 7px; height: 7px; border-radius: 50%; background: #4d9b72; }
+    .legend-dot.exam { background: #638bb3; }
+    .agenda-panel { padding: 0; overflow: hidden; }
+    .agenda-head { padding: 20px 20px 15px; border-bottom: 1px solid var(--line); }
+    .agenda-title-line { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .agenda-date { color: var(--muted); font-size: 13px; }
+    .agenda-list { display: grid; gap: 10px; padding: 15px 17px 18px; }
+    .exam-row { display: flex; gap: 12px; padding: 13px; border-radius: 14px; background: var(--blue-soft); }
+    .exam-mark { flex: 0 0 auto; width: 4px; border-radius: 999px; background: var(--blue); }
+    .exam-info { flex: 1; min-width: 0; }
+    .exam-kicker { color: #527899; font-size: 12px; font-weight: 750; letter-spacing: .05em; text-transform: uppercase; }
+    .exam-name { margin-top: 3px; font-size: 14px; font-weight: 720; }
+    .exam-meta { margin-top: 4px; color: #52697d; font-size: 13px; line-height: 1.4; }
+    .task-row {
+      display: flex; align-items: flex-start; gap: 11px; padding: 12px 11px; border: 1px solid var(--line);
+      border-radius: 14px; background: #fff;
+    }
+    .task-check { width: 18px; height: 18px; flex: 0 0 auto; margin: 2px 0 0; accent-color: var(--green); cursor: pointer; }
+    .task-main { flex: 1; min-width: 0; }
+    .task-title { font-size: 14px; font-weight: 650; line-height: 1.4; }
+    .task-row.is-complete .task-title { color: #849087; text-decoration: line-through; }
+    .task-meta { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 5px; color: var(--muted); font-size: 12px; }
+    .task-time { color: var(--muted); white-space: nowrap; font-size: 12px; }
+    .subject-tag { display: inline-flex; align-items: center; gap: 5px; font-weight: 650; }
+    .subject-tag i { width: 7px; height: 7px; border-radius: 50%; background: var(--tag, var(--green)); }
+    .empty-state { padding: 25px 16px; border: 1px dashed #cad6ce; border-radius: 14px; color: var(--muted); text-align: center; font-size: 14px; line-height: 1.5; }
+    .lower-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; margin-top: 18px; }
+    .exam-list, .subject-list, .task-list, .topic-list { display: grid; gap: 10px; }
+    .exam-compact { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .exam-compact:last-child { border-bottom: 0; padding-bottom: 0; }
+    .exam-compact:first-child { padding-top: 0; }
+    .exam-compact-title { font-size: 14px; font-weight: 700; }
+    .exam-compact-meta { margin-top: 3px; color: var(--muted); font-size: 13px; }
+    .countdown-chip, .status-chip, .type-chip {
+      display: inline-flex; align-items: center; min-height: 26px; padding: 4px 9px; border-radius: 999px;
+      background: var(--green-soft); color: var(--green-dark); font-size: 12px; font-weight: 700; white-space: nowrap;
+    }
+    .status-chip.in-progress { background: var(--amber-soft); color: var(--amber); }
+    .status-chip.not-started { background: #edf0ee; color: #68756d; }
+    .progress-line { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 7px; color: var(--muted); font-size: 13px; }
+    .progress-track { height: 7px; overflow: hidden; border-radius: 999px; background: #e9eeeb; }
+    .progress-fill { height: 100%; border-radius: inherit; background: var(--green); }
+    .subject-card { padding: 17px; }
+    .subject-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+    .subject-name-line { display: flex; align-items: center; gap: 10px; }
+    .subject-color { width: 10px; height: 10px; flex: 0 0 auto; border-radius: 50%; background: var(--subject-color, var(--green)); }
+    .subject-name { font-size: 16px; font-weight: 750; }
+    .subject-code { margin-top: 4px; color: var(--muted); font-size: 13px; }
+    .subject-exam { margin-top: 12px; color: var(--muted); font-size: 13px; }
+    .topic-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+    .topic-row:last-child { border-bottom: 0; }
+    .topic-name { font-size: 14px; font-weight: 600; line-height: 1.4; }
+    .topic-actions { display: flex; align-items: center; gap: 7px; flex: 0 0 auto; }
+    .topic-remove-button { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--muted); font-size: 16px; line-height: 1; cursor: pointer; }
+    .topic-remove-button:hover { border-color: var(--red); color: var(--red); background: var(--red-soft); }
+    .topic-add-button { width: 100%; margin-top: 10px; }
+    .topic-status-button { border: 0; cursor: pointer; }
+    .topic-hint { margin-top: 13px; color: var(--muted); font-size: 13px; }
+    .subject-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+    .tasks-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 15px; }
+    .filter-row { display: flex; flex-wrap: wrap; gap: 7px; }
+    .filter-button { min-height: 35px; padding: 6px 11px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--muted); font-size: 13px; cursor: pointer; }
+    .filter-button[aria-pressed="true"] { border-color: var(--green); background: var(--green-soft); color: var(--green-dark); font-weight: 700; }
+    .task-day-group { margin-bottom: 20px; }
+    .task-day-title { margin-bottom: 9px; color: var(--muted); font-size: 13px; font-weight: 750; letter-spacing: .035em; text-transform: uppercase; }
+    .progress-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(300px, .9fr); gap: 18px; }
+    .progress-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .progress-card { padding: 16px; }
+    .progress-number { margin-top: 7px; font-size: 25px; font-weight: 750; letter-spacing: -.04em; }
+    .progress-detail { margin-top: 4px; color: var(--muted); font-size: 13px; }
+    .settings-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+    .settings-card { padding: 20px; }
+    .settings-card p { margin-top: 8px; color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .settings-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
+    .demo-note { display: flex; align-items: flex-start; gap: 11px; margin-top: 18px; padding: 14px 16px; border-radius: 14px; background: #f0f5f1; color: #53645a; font-size: 13px; line-height: 1.5; }
+    .demo-note strong { color: #2c5340; }
+    .chat-shell { display: grid; grid-template-rows: minmax(280px,1fr) auto; min-height: min(68vh,720px); overflow: hidden; padding: 0; }
+    .chat-feed { display: flex; flex-direction: column; gap: 14px; overflow-y: auto; padding: 22px; }
+    .chat-empty { display: grid; flex: 1; place-content: center; text-align: center; padding: 28px; }
+    .chat-empty-mark { display: grid; width: 46px; height: 46px; place-items: center; margin: 0 auto 12px; border-radius: 15px; background: var(--green-soft); color: var(--green-dark); font-size: 22px; }
+    .chat-empty h2 { margin: 0; font-size: 18px; }
+    .chat-empty p { max-width: 440px; margin: 7px auto 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .chat-message { max-width: min(84%,720px); padding: 13px 15px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface-soft); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55; }
+    .chat-message.user { align-self: flex-end; border-color: transparent; border-bottom-right-radius: 5px; background: var(--green); color: white; }
+    .chat-message.assistant { align-self: flex-start; border-bottom-left-radius: 5px; }
+    .chat-message-label { margin-bottom: 5px; color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .06em; text-transform: uppercase; }
+    .chat-message.user .chat-message-label { color: rgba(255,255,255,.78); }
+    .chat-error { color: var(--red); }
+    .chat-pending { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .chat-pending-title { margin: 0 0 8px; font-size: 13px; font-weight: 750; }
+    .chat-proposal-list { display: grid; gap: 6px; margin: 0 0 10px; padding-left: 18px; color: var(--muted); font-size: 13px; }
+    .chat-pending-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chat-compose { padding: 16px 20px; border-top: 1px solid var(--line); background: var(--surface); }
+    .chat-compose-row { display: flex; align-items: flex-end; gap: 10px; }
+    .chat-compose-row textarea { flex: 1; min-height: 50px; max-height: 150px; resize: vertical; padding: 12px 13px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface-soft); color: var(--ink); font: inherit; line-height: 1.45; }
+    .chat-compose-row .button { min-height: 48px; }
+    .chat-compose-note { display: flex; justify-content: space-between; gap: 10px; margin-top: 9px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .chat-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .chat-api-status { color: var(--muted); font-size: 12px; }
+    :root[data-theme="dark"] .chat-compose-row textarea { background: #15211b; }
+    :root[data-theme="dark"] .chat-message.assistant { background: var(--surface-soft); }
+    .site-footer { display: flex; justify-content: space-between; gap: 14px; padding: 0 clamp(22px, 4vw, 54px) 22px; color: var(--muted); font-size: 12px; }
+    .modal-backdrop { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgba(18, 31, 24, .42); }
+    .modal { width: min(100%, 520px); max-height: min(90vh, 760px); overflow: auto; padding: 23px; border: 1px solid var(--line); border-radius: 20px; background: #fff; box-shadow: 0 24px 70px rgba(18,31,24,.24); }
+    .modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 17px; }
+    .modal-copy { margin-top: 6px; color: var(--muted); font-size: 14px; line-height: 1.45; }
+    .icon-button { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid var(--line); border-radius: 11px; background: #fff; font-size: 19px; cursor: pointer; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .field { display: grid; gap: 6px; min-width: 0; }
+    .field-full { grid-column: 1 / -1; }
+    .field label { font-size: 14px; font-weight: 650; }
+    .field input, .field select, .field textarea {
+      width: 100%; min-height: 43px; padding: 9px 11px; border: 1px solid #cfd9d2; border-radius: 10px;
+      background: #fff; color: var(--ink); font-size: 15px;
+    }
+    .field textarea { min-height: 112px; resize: vertical; line-height: 1.5; }
+    .field-help { color: var(--muted); font-size: 12px; line-height: 1.4; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 19px; }
+    .toast {
+      position: fixed; right: 22px; bottom: 22px; z-index: 40; max-width: min(400px, calc(100vw - 44px));
+      padding: 13px 16px; border-radius: 12px; background: #193e2d; color: #fff; box-shadow: var(--shadow);
+      font-size: 14px; line-height: 1.45;
+    }
+    .hidden { display: none !important; }
+    .onboarding-shell {
+      min-height: 100vh; display: grid; place-items: center; padding: 30px;
+      background: radial-gradient(ellipse at top left, #e6f1ea 0, #f4f7f5 47%, #edf3ef 100%);
+    }
+    .onboarding-card {
+      display: grid; grid-template-columns: minmax(280px, .82fr) minmax(420px, 1.18fr);
+      width: min(100%, 1040px); overflow: hidden; border: 1px solid var(--line);
+      border-radius: 26px; background: var(--surface); box-shadow: 0 24px 70px rgba(29,57,43,.12);
+    }
+    .onboarding-aside {
+      display: flex; flex-direction: column; justify-content: space-between; min-height: 620px;
+      padding: 36px; background: var(--green); color: #fff;
+    }
+    .onboarding-aside .brand-mark { background: rgba(255,255,255,.16); color: #fff; }
+    .onboarding-aside .brand-name { font-size: 17px; }
+    .onboarding-aside .brand-subtitle { color: rgba(255,255,255,.75); }
+    .onboarding-pitch h1 { max-width: 340px; font-size: 35px; letter-spacing: -.05em; }
+    .onboarding-pitch p { max-width: 360px; margin-top: 13px; color: rgba(255,255,255,.8); font-size: 16px; line-height: 1.6; }
+    .onboarding-points { display: grid; gap: 11px; margin-top: 27px; color: rgba(255,255,255,.92); font-size: 14px; }
+    .onboarding-points span::before { content: "✓"; display: inline-grid; width: 22px; height: 22px; place-items: center; margin-right: 9px; border-radius: 50%; background: rgba(255,255,255,.16); }
+    .onboarding-aside-note { color: rgba(255,255,255,.73); font-size: 13px; line-height: 1.5; }
+    .onboarding-main { padding: 35px clamp(24px, 4vw, 46px); }
+    .onboarding-step { color: var(--green); font-size: 12px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .onboarding-main h2 { margin-top: 9px; font-size: 26px; letter-spacing: -.04em; }
+    .onboarding-description { margin-top: 7px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .onboarding-form { display: grid; gap: 14px; margin-top: 22px; }
+    .onboarding-form .form-grid { gap: 12px; }
+    .onboarding-mode { margin-top: 15px; padding: 13px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface-soft); }
+    .onboarding-mode .field-help { margin-bottom: 7px; }
+    .radio-option { display: flex; align-items: flex-start; gap: 9px; padding: 7px 2px; color: var(--ink); font-size: 13px; cursor: pointer; }
+    .radio-option input { flex: 0 0 auto; width: 16px; height: 16px; margin: 2px 0 0; accent-color: var(--green); }
+    .radio-option span { display: grid; gap: 3px; }
+    .radio-option small { color: var(--muted); font-size: 12px; line-height: 1.4; }
+    .onboarding-submit { width: 100%; margin-top: 3px; }
+    .privacy-note { margin-top: 12px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .api-status { display: inline-flex; align-items: center; gap: 7px; min-height: 28px; padding: 5px 10px; border-radius: 999px; background: var(--amber-soft); color: var(--amber); font-size: 12px; font-weight: 700; }
+    .api-status.is-ready { background: var(--green-soft); color: var(--green-dark); }
+    .api-status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .api-key-row { display: flex; align-items: center; gap: 8px; }
+    .api-key-row .field { flex: 1; }
+    .api-disclosure { margin-top: 13px; padding: 12px 13px; border-radius: 12px; background: var(--amber-soft); color: #70491f; font-size: 13px; line-height: 1.5; }
+    .api-link { color: var(--green-dark); font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    .consent-row { display: flex; align-items: flex-start; gap: 9px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface-soft); color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .consent-row input { flex: 0 0 auto; width: 17px; height: 17px; margin: 1px 0 0; accent-color: var(--green); }
+    .loading-button { opacity: .72; pointer-events: none; }
+    :root[data-theme="dark"] .topbar { background: rgba(26,38,32,.9); }
+    :root[data-theme="dark"] .nav-button { color: #b5c2ba; }
+    :root[data-theme="dark"] .side-label,
+    :root[data-theme="dark"] .calendar-weekdays,
+    :root[data-theme="dark"] .calendar-day.is-other-month,
+    :root[data-theme="dark"] .task-row.is-complete .task-title,
+    :root[data-theme="dark"] .text-button:disabled { color: #9caca2; }
+    :root[data-theme="dark"] .button,
+    :root[data-theme="dark"] .task-row,
+    :root[data-theme="dark"] .filter-button,
+    :root[data-theme="dark"] .modal,
+    :root[data-theme="dark"] .icon-button { background: var(--surface); }
+    :root[data-theme="dark"] .button-primary,
+    :root[data-theme="dark"] .button-primary:hover { background: var(--green); border-color: var(--green); color: #102219; }
+    :root[data-theme="dark"] .field input,
+    :root[data-theme="dark"] .field select,
+    :root[data-theme="dark"] .field textarea { background: #15211b; border-color: var(--line); }
+    :root[data-theme="dark"] .exam-kicker,
+    :root[data-theme="dark"] .exam-meta,
+    :root[data-theme="dark"] .api-disclosure { color: var(--muted); }
+    :root[data-theme="dark"] .exam-row { background: var(--blue-soft); }
+    :root[data-theme="dark"] .exam-kicker { color: var(--blue); }
+    :root[data-theme="dark"] .status-chip.not-started { background: #2c3932; color: #c0cdc5; }
+    :root[data-theme="dark"] .progress-track { background: #2b3a32; }
+    :root[data-theme="dark"] .demo-note { background: var(--surface-soft); color: var(--muted); }
+    :root[data-theme="dark"] .demo-note strong { color: var(--green-dark); }
+    :root[data-theme="dark"] .api-link { color: var(--green-dark); }
+    :root[data-theme="dark"] .api-disclosure { background: var(--amber-soft); }
+    :root[data-theme="dark"] .onboarding-shell { background: radial-gradient(ellipse at top left, #243b2e 0, #111a16 55%, #19241e 100%); }
+    :root[data-theme="dark"] .onboarding-aside .brand-mark { color: #fff; }
+    @media (max-width: 1080px) {
+      .app-shell { grid-template-columns: 210px minmax(0,1fr); }
+      .dashboard-grid { grid-template-columns: minmax(0,1fr); }
+      .agenda-panel { min-height: 220px; }
+    }
+    @media (max-width: 760px) {
+      .app-shell { display: block; padding-bottom: 76px; }
+      .sidebar { position: fixed; z-index: 15; inset: auto 0 0; display: block; width: 100%; height: 68px; padding: 7px 8px; border-top: 1px solid var(--line); border-right: 0; box-shadow: 0 -8px 24px rgba(29,57,43,.06); }
+      .brand, .side-label, .sidebar-spacer, .local-badge { display: none; }
+      .nav-list { display: flex; justify-content: flex-start; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+      .nav-list::-webkit-scrollbar { display: none; }
+      .nav-button { display: grid; flex: 1 0 58px; justify-items: center; align-content: center; gap: 2px; min-width: 58px; min-height: 52px; padding: 4px; border-radius: 10px; font-size: 11px; }
+      .nav-glyph { width: 25px; height: 23px; font-size: 16px; }
+      .topbar { min-height: 66px; padding: 11px 18px; }
+      .mobile-brand { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 750; }
+      .mobile-brand .brand-mark { width: 32px; height: 32px; border-radius: 10px; font-size: 15px; }
+      .top-caption { display: none; }
+      .topbar-actions .button { min-height: 37px; padding: 7px 10px; font-size: 12px; }
+      .avatar { width: 34px; height: 34px; }
+      .main-content { padding: 23px 16px 30px; }
+      .page-heading { align-items: flex-start; flex-direction: column; margin-bottom: 18px; }
+      .heading-actions { justify-content: flex-start; width: 100%; }
+      .stats-grid { gap: 9px; }
+      .stat-card { min-height: 101px; padding: 13px; }
+      .stat-label, .stat-foot { font-size: 12px; }
+      .stat-value { font-size: 21px; }
+      .lower-grid, .progress-layout, .settings-grid { grid-template-columns: minmax(0,1fr); }
+      .subject-grid { grid-template-columns: minmax(0,1fr); }
+      .site-footer { padding: 0 17px 16px; }
+      .onboarding-shell { padding: 16px; }
+      .onboarding-card { grid-template-columns: minmax(0,1fr); }
+      .onboarding-aside { min-height: auto; gap: 25px; padding: 24px; }
+      .onboarding-pitch h1 { font-size: 28px; }
+      .onboarding-points { grid-template-columns: repeat(3, minmax(0,1fr)); gap: 6px; font-size: 12px; }
+      .onboarding-points span::before { margin-right: 5px; }
+      .onboarding-aside-note { display: none; }
+      .onboarding-main { padding: 24px; }
+    }
+    @media (max-width: 430px) {
+      .topbar-actions .top-add-task { display: none; }
+      .stats-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .stats-grid .stat-card:last-child { grid-column: 1 / -1; }
+      .panel { padding: 15px; }
+      .calendar-day { min-height: 49px; padding-top: 6px; font-size: 12px; }
+      .calendar-weekdays { font-size: 11px; }
+      .month-controls strong { min-width: 112px; font-size: 13px; }
+      .month-nav { padding: 6px 7px; }
+      .form-grid { grid-template-columns: minmax(0,1fr); }
+      .field-full { grid-column: auto; }
+      .site-footer { font-size: 11px; }
+      .onboarding-shell { padding: 0; }
+      .onboarding-card { border-radius: 0; border-left: 0; border-right: 0; }
+      .onboarding-points { grid-template-columns: minmax(0,1fr); }
+      .api-key-row { align-items: stretch; flex-direction: column; }
+      .chat-shell { min-height: 62vh; }
+      .chat-feed { padding: 15px; }
+      .chat-message { max-width: 94%; }
+      .chat-compose { padding: 12px; }
+      .chat-compose-note { flex-direction: column; gap: 3px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="onboarding-root"></div>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">S</div>
+        <div><div class="brand-name">Semester Sathi</div><div class="brand-subtitle">Your semester planner</div></div>
+      </div>
+      <p class="side-label">Workspace</p>
+      <nav class="nav-list" aria-label="App sections">
+        <button class="nav-button" type="button" data-page="overview"><span class="nav-glyph" aria-hidden="true">⌂</span><span>Overview</span></button>
+        <button class="nav-button" type="button" data-page="calendar"><span class="nav-glyph" aria-hidden="true">▦</span><span>Calendar</span></button>
+        <button class="nav-button" type="button" data-page="subjects"><span class="nav-glyph" aria-hidden="true">▤</span><span>Subjects</span></button>
+        <button class="nav-button" type="button" data-page="tasks"><span class="nav-glyph" aria-hidden="true">✓</span><span>To-dos</span></button>
+        <button class="nav-button" type="button" data-page="chat"><span class="nav-glyph" aria-hidden="true">✦</span><span>AI Chat</span></button>
+        <button class="nav-button" type="button" data-page="progress"><span class="nav-glyph" aria-hidden="true">◔</span><span>Progress</span></button>
+        <button class="nav-button" type="button" data-page="settings"><span class="nav-glyph" aria-hidden="true">⚙</span><span>Data & settings</span></button>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="local-badge">
+        <span class="local-icon" aria-hidden="true"></span>
+        <div><div class="local-title">Local-first demo</div><div class="local-copy">Semester data stays here.<br>Gemini is optional online.</div></div>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="mobile-brand"><span class="brand-mark" aria-hidden="true">S</span>Semester Sathi</div>
+          <span id="top-caption" class="top-caption">Your study workspace</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="button top-add-task" type="button" data-action="add-task">Add task</button>
+          <button class="button button-primary" type="button" data-action="build-plan">Build study plan</button>
+          <span id="avatar-initial" class="avatar" aria-label="Student profile">S</span>
+        </div>
+      </header>
+      <main id="main-content" class="main-content" tabindex="-1"></main>
+      <footer class="site-footer"><span id="storage-note">Changes are saved in this browser.</span><span id="api-footer-status">Gemini API not connected</span></footer>
+    </div>
+  </div>
+  <div id="modal-root"></div>
+  <div id="toast-root" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      "use strict";
+      var STORAGE_KEY = "semester-sathi-demo-v1";
+      var COLORS = { physics: "#4779a0", chemistry: "#438663", mathematics: "#c47e36", biology: "#8b6bb0" };
+      var pageNames = {
+        overview: ["Overview", "Your semester at a glance"],
+        calendar: ["Calendar", "Tap a date to see exams and study tasks"],
+        subjects: ["Subjects", "Track syllabus topics and exam details"],
+        tasks: ["To-dos", "Small study steps, ready to tick off"],
+        chat: ["AI Chat", "Chat with Gemini about your semester"],
+        progress: ["Progress", "See how your preparation is moving"],
+        settings: ["Data & settings", "Your demo data stays in this browser"]
+      };
+
+      function localISO(date) {
+        return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0");
+      }
+      function dayOffset(value) {
+        var d = new Date();
+        d.setHours(12, 0, 0, 0);
+        d.setDate(d.getDate() + value);
+        return localISO(d);
+      }
+      function parseLocal(value) {
+        var parts = value.split("-").map(Number);
+        return new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0, 0);
+      }
+      function dateLabel(value, options) {
+        return new Intl.DateTimeFormat("en-IN", options || { day: "numeric", month: "short", year: "numeric" }).format(parseLocal(value));
+      }
+      function weekdayLabel(value) {
+        return new Intl.DateTimeFormat("en-IN", { weekday: "long", day: "numeric", month: "long" }).format(parseLocal(value));
+      }
+      function daysBetween(from, to) {
+        return Math.round((parseLocal(to).getTime() - parseLocal(from).getTime()) / 86400000);
+      }
+      function uid() { return "item-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7); }
+      function scheduleNativeReminder(task) {
+        if (!task || !task.reminderEnabled || !window.Android || typeof window.Android.scheduleReminder !== "function") return;
+        try { window.Android.scheduleReminder(String(task.id), String(task.title), String(task.date), String(task.time)); }
+        catch (e) { showToast("The phone could not schedule this reminder."); }
+      }
+      function cancelNativeReminder(taskId) {
+        if (!window.Android || typeof window.Android.cancelReminder !== "function") return;
+        try { window.Android.cancelReminder(String(taskId)); } catch (e) { }
+      }
+
+      function sampleState() {
+        var today = localISO(new Date());
+        var subjects = [
+          { id: "physics", name: "Physics", code: "PHY 204", examDate: dayOffset(6), examTime: "10:00", room: "Hall B", color: COLORS.physics, topics: [
+            { name: "Electrostatics", status: "done" }, { name: "Current Electricity", status: "done" },
+            { name: "Magnetism", status: "in-progress" }, { name: "Electromagnetic Induction", status: "not-started" },
+            { name: "Optics", status: "not-started" }, { name: "Modern Physics", status: "not-started" }
+          ] },
+          { id: "chemistry", name: "Chemistry", code: "CHEM 204", examDate: dayOffset(12), examTime: "14:00", room: "Science Block 2", color: COLORS.chemistry, topics: [
+            { name: "Chemical Kinetics", status: "done" }, { name: "Electrochemistry", status: "in-progress" },
+            { name: "Coordination Compounds", status: "not-started" }, { name: "Organic Reactions", status: "not-started" },
+            { name: "Solutions", status: "not-started" }
+          ] },
+          { id: "mathematics", name: "Mathematics", code: "MATH 204", examDate: dayOffset(18), examTime: "09:30", room: "Main Hall", color: COLORS.mathematics, topics: [
+            { name: "Differential Equations", status: "done" }, { name: "Integration", status: "in-progress" },
+            { name: "Vector Calculus", status: "not-started" }, { name: "Probability", status: "not-started" },
+            { name: "Linear Algebra", status: "not-started" }
+          ] }
+        ];
+        var tasks = [
+          { id: "demo-1", title: "Revise Electrostatics formula sheet", subjectId: "physics", date: today, time: "09:00", duration: 35, type: "Revision", completed: true, generated: false },
+          { id: "demo-2", title: "Finish Nernst equation examples", subjectId: "chemistry", date: today, time: "11:30", duration: 40, type: "Practice", completed: false, generated: false },
+          { id: "demo-3", title: "Practice 10 integration problems", subjectId: "mathematics", date: today, time: "17:00", duration: 50, type: "Practice", completed: false, generated: false },
+          { id: "demo-4", title: "Solve a Current Electricity question set", subjectId: "physics", date: dayOffset(1), time: "10:00", duration: 45, type: "Practice", completed: false, generated: false },
+          { id: "demo-5", title: "Make a one-page chapter summary", subjectId: "chemistry", date: dayOffset(2), time: "16:30", duration: 30, type: "Notes", completed: false, generated: false },
+          { id: "demo-6", title: "Review errors from the mock test", subjectId: "physics", date: dayOffset(3), time: "18:00", duration: 35, type: "Revision", completed: false, generated: false },
+          { id: "demo-7", title: "Complete the integration worksheet", subjectId: "mathematics", date: dayOffset(4), time: "15:00", duration: 50, type: "Assignment", completed: false, generated: false }
+        ];
+        return { semester: "Semester 4", profile: null, today: today, selectedDate: today, viewMonth: today.slice(0, 7), page: "overview", taskFilter: "all", theme: "light", subjects: subjects, tasks: tasks, chatMessages: [] };
+      }
+
+      function loadState() {
+        try {
+          var raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return sampleState();
+          var parsed = JSON.parse(raw);
+          if (!parsed || !Array.isArray(parsed.subjects) || !Array.isArray(parsed.tasks)) return sampleState();
+          if (parsed.theme !== "dark" && parsed.theme !== "light") parsed.theme = "light";
+          if (!Array.isArray(parsed.chatMessages)) parsed.chatMessages = [];
+          parsed.chatMessages = parsed.chatMessages.filter(function (message) { return message && (message.role === "user" || message.role === "assistant") && typeof message.text === "string"; }).slice(-60);
+          parsed.subjects.forEach(function (subject) { delete subject.progressOverride; });
+          return parsed;
+        } catch (e) { return sampleState(); }
+      }
+      var state = loadState();
+      function readSessionApiKey() {
+        try { return sessionStorage.getItem("semester-sathi-gemini-key") || ""; }
+        catch (e) { return ""; }
+      }
+      var apiKey = readSessionApiKey();
+      var chatLoading = false;
+      function refreshApiStatus() {
+        var footer = document.getElementById("api-footer-status");
+        if (footer) footer.textContent = apiKey ? "Gemini key saved for this session · AI needs internet" : "Offline planner ready · Gemini optional";
+        var badge = document.getElementById("gemini-status-badge");
+        if (badge) {
+          badge.className = "api-status" + (apiKey ? " is-ready" : "");
+          badge.innerHTML = '<span class="api-status-dot" aria-hidden="true"></span>' + (apiKey ? "Key saved for this session" : "No key saved");
+        }
+      }
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          document.getElementById("storage-note").textContent = "Changes are saved in this browser.";
+        } catch (e) {
+          document.getElementById("storage-note").textContent = "Browser storage is unavailable; changes last until you close this tab.";
+        }
+      }
+      function esc(value) {
+        return String(value == null ? "" : value).replace(/[&<>"']/g, function (char) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char];
+        });
+      }
+      function subjectById(id) { return state.subjects.find(function (subject) { return subject.id === id; }); }
+      function subjectName(id) { var subject = subjectById(id); return subject ? subject.name : "General"; }
+      function subjectColor(id) { var subject = subjectById(id); return subject ? subject.color : "#728078"; }
+      function countTopics(subject, status) {
+        return subject.topics.filter(function (topic) { return !status || topic.status === status; }).length;
+      }
+      function subjectProgress(subject) {
+        return subject.topics.length ? Math.round(countTopics(subject, "done") / subject.topics.length * 100) : 0;
+      }
+      function overallProgress() {
+        var topicWeight = 0, weightedProgress = 0;
+        state.subjects.forEach(function (subject) {
+          var weight = Math.max(1, subject.topics.length);
+          topicWeight += weight;
+          weightedProgress += subjectProgress(subject) * weight;
+        });
+        return topicWeight ? Math.round(weightedProgress / topicWeight) : 0;
+      }
+      function totalTopics() { return state.subjects.reduce(function (sum, subject) { return sum + subject.topics.length; }, 0); }
+      function doneTopics() { return state.subjects.reduce(function (sum, subject) { return sum + countTopics(subject, "done"); }, 0); }
+      function sortedExams() {
+        return state.subjects.filter(function (subject) { return subject.examDate; }).sort(function (a, b) { return a.examDate.localeCompare(b.examDate); });
+      }
+      function upcomingExams() {
+        return sortedExams().filter(function (subject) { return daysBetween(state.today, subject.examDate) >= 0; });
+      }
+      function tasksForDate(date) {
+        return state.tasks.filter(function (task) { return task.date === date; }).sort(function (a, b) { return a.time.localeCompare(b.time); });
+      }
+      function taskMarkup(task) {
+        var color = subjectColor(task.subjectId);
+        return '<label class="task-row' + (task.completed ? ' is-complete' : '') + '">' +
+          '<input class="task-check" type="checkbox" data-task-check="' + esc(task.id) + '"' + (task.completed ? ' checked' : '') + ' aria-label="Mark ' + esc(task.title) + ' complete">' +
+          '<span class="task-main"><span class="task-title">' + esc(task.title) + '</span><span class="task-meta"><span class="subject-tag" style="--tag:' + esc(color) + '"><i aria-hidden="true"></i>' + esc(subjectName(task.subjectId)) + '</span><span>·</span><span>' + esc(task.type || "Study") + '</span><span>·</span><span>' + esc(task.duration) + ' min</span></span></span>' +
+          '<span class="task-time">' + esc(task.time) + '</span></label>';
+      }
+      function findAvailableTime(date, preferredHour, duration) {
+        for (var hour = Math.max(8, preferredHour); hour <= 20; hour++) {
+          var start = hour * 60;
+          var end = start + duration;
+          var overlaps = state.tasks.some(function (task) {
+            if (task.date !== date) return false;
+            var parts = task.time.split(":").map(Number);
+            var taskStart = parts[0] * 60 + parts[1];
+            var taskEnd = taskStart + Number(task.duration || 30);
+            return start < taskEnd && end > taskStart;
+          });
+          if (!overlaps) return String(hour).padStart(2, "0") + ":00";
+        }
+        return "20:00";
+      }
+      function examMarkup(subject, date) {
+        return '<div class="exam-row"><span class="exam-mark" aria-hidden="true"></span><div class="exam-info"><div class="exam-kicker">Exam' + (date === subject.examDate ? ' · ' + esc(subject.code) : '') + '</div><div class="exam-name">' + esc(subject.name) + ' paper</div><div class="exam-meta">' + esc(subject.examTime || "Time not set") + ' · ' + esc(subject.room || "Room not set") + '</div></div></div>';
+      }
+      function agendaMarkup(date) {
+        var exam = state.subjects.find(function (subject) { return subject.examDate === date; });
+        var tasks = tasksForDate(date);
+        var content = "";
+        if (exam) content += examMarkup(exam, date);
+        if (tasks.length) content += tasks.map(taskMarkup).join("");
+        if (!exam && !tasks.length) content = '<div class="empty-state">Nothing planned for this date yet.<br>Choose <strong>Add task</strong> or build a study plan.</div>';
+        return '<div class="agenda-head"><div class="agenda-title-line"><div><h2>Day plan</h2><p class="panel-subtitle">' + esc(weekdayLabel(date)) + '</p></div>' +
+          '<button class="button button-small" type="button" data-action="add-task" data-date="' + esc(date) + '">Add task</button></div></div>' +
+          '<div class="agenda-list">' + content + '</div>';
+      }
+      function monthCalendarMarkup() {
+        var pieces = state.viewMonth.split("-").map(Number);
+        var year = pieces[0], month = pieces[1] - 1;
+        var first = new Date(year, month, 1, 12);
+        var offset = (first.getDay() + 6) % 7;
+        var start = new Date(year, month, 1 - offset, 12);
+        var days = [];
+        for (var i = 0; i < 42; i++) {
+          var day = new Date(start);
+          day.setDate(start.getDate() + i);
+          var key = localISO(day);
+          var inMonth = day.getMonth() === month;
+          var taskCount = tasksForDate(key).length;
+          var exam = state.subjects.some(function (subject) { return subject.examDate === key; });
+          var classes = "calendar-day" + (!inMonth ? " is-other-month" : "") + (key === state.today ? " is-today" : "");
+          var pressed = key === state.selectedDate ? ' aria-pressed="true"' : ' aria-pressed="false"';
+          var dots = (exam ? '<span class="day-dot exam" aria-label="Exam"></span>' : '') + (taskCount ? '<span class="day-dot" aria-label="Study task"></span>' : '');
+          days.push('<button class="' + classes + '" type="button" data-date="' + key + '"' + pressed + ' aria-label="' + esc(weekdayLabel(key)) + (exam ? ', exam' : '') + (taskCount ? ', ' + taskCount + ' study tasks' : '') + '"><span>' + day.getDate() + '</span><span class="day-dots">' + dots + '</span></button>');
+        }
+        var monthTitle = new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(new Date(year, month, 1, 12));
+        return '<div class="panel"><div class="panel-head"><div><h2>Calendar</h2><p class="panel-subtitle">Select a date to open its plan.</p></div><div class="month-controls"><button class="button month-nav" type="button" data-action="month-prev" aria-label="Previous month">Prev</button><strong>' + esc(monthTitle) + '</strong><button class="button month-nav" type="button" data-action="month-next" aria-label="Next month">Next</button></div></div>' +
+          '<div class="calendar-weekdays" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>' +
+          '<div class="calendar-grid" aria-label="Calendar dates">' + days.join("") + '</div>' +
+          '<div class="calendar-legend"><span class="legend-item"><i class="legend-dot"></i> Study task</span><span class="legend-item"><i class="legend-dot exam"></i> Exam</span></div></div>';
+      }
+      function subjectSummaryMarkup(subject) {
+        var total = subject.topics.length;
+        var done = countTopics(subject, "done");
+        var percent = total ? Math.round(done / total * 100) : 0;
+        var days = daysBetween(state.today, subject.examDate);
+        return '<div class="exam-compact"><div><div class="exam-compact-title">' + esc(subject.name) + '</div><div class="exam-compact-meta">' + esc(dateLabel(subject.examDate)) + ' · ' + esc(subject.examTime || "Time TBA") + '</div></div><span class="countdown-chip">' + (days === 0 ? 'Today' : days + ' days') + '</span></div>';
+      }
+      function subjectCardMarkup(subject) {
+        var done = countTopics(subject, "done");
+        var inProgress = countTopics(subject, "in-progress");
+        var pct = subjectProgress(subject);
+        var topics = subject.topics.map(function (topic, index) {
+          var label = topic.status === "done" ? "Done" : topic.status === "in-progress" ? "In progress" : "Not started";
+          var cls = topic.status === "done" ? "" : topic.status === "in-progress" ? " in-progress" : " not-started";
+          return '<div class="topic-row"><span class="topic-name">' + esc(topic.name) + '</span><div class="topic-actions"><button class="status-chip topic-status-button' + cls + '" type="button" data-topic="' + esc(subject.id) + ':' + index + '" aria-label="Change status for ' + esc(topic.name) + '">' + label + '</button><button class="topic-remove-button" type="button" data-action="remove-topic" data-subject="' + esc(subject.id) + '" data-topic-index="' + index + '" aria-label="Remove ' + esc(topic.name) + ' from ' + esc(subject.name) + '">×</button></div></div>';
+        }).join("");
+        return '<article class="subject-card" data-subject-card="' + esc(subject.id) + '"><div class="subject-card-head"><div><div class="subject-name-line"><i class="subject-color" style="--subject-color:' + esc(subject.color) + '"></i><span class="subject-name">' + esc(subject.name) + '</span></div><div class="subject-code">' + esc(subject.code || "Subject") + '</div></div><span class="status-chip">' + done + ' / ' + subject.topics.length + ' topics done</span></div>' +
+          '<p class="subject-exam">Exam: <strong>' + esc(dateLabel(subject.examDate)) + '</strong> · ' + esc(subject.examTime || "Time TBA") + ' · ' + esc(subject.room || "Room TBA") + '</p>' +
+          '<div class="progress-line"><span>Syllabus completion · from topics</span><strong>' + pct + '%</strong></div><div class="progress-track" role="progressbar" aria-label="' + esc(subject.name) + ' syllabus completion" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100"><div class="progress-fill" style="width:' + pct + '%;background:' + esc(subject.color) + '"></div></div>' +
+          '<div class="topic-list" style="margin-top:12px">' + (topics || '<div class="empty-state">No chapters or lessons yet. Add some to start tracking this subject.</div>') + '</div><button class="button button-small topic-add-button" type="button" data-action="add-topic" data-subject="' + esc(subject.id) + '">+ Add chapter / lesson</button><p class="topic-hint">' + inProgress + ' topic' + (inProgress === 1 ? '' : 's') + ' in progress · Tap a status to update it.</p></article>';
+      }
+      function pageHeading(title, description, actions) {
+        var context = state.profile ? (state.profile.semester || state.profile.yearLevel || state.semester || "My semester") : "My study workspace";
+        return '<div class="page-heading"><div><p class="eyebrow">' + esc(context) + ' · Personal workspace</p><h1>' + esc(title) + '</h1><p class="page-description">' + esc(description) + '</p></div><div class="heading-actions">' + (actions || '') + '</div></div>';
+      }
+      function renderOverview() {
+        var exams = upcomingExams();
+        var nextExam = exams[0];
+        var todaysTasks = tasksForDate(state.today);
+        var openToday = todaysTasks.filter(function (task) { return !task.completed; }).length;
+        var total = totalTopics();
+        var completed = doneTopics();
+        var pct = overallProgress();
+        var examText = nextExam ? esc(nextExam.name) + ' · ' + esc(dateLabel(nextExam.examDate)) : "No upcoming exams";
+        var days = nextExam ? daysBetween(state.today, nextExam.examDate) : null;
+        var stats = '<div class="stats-grid"><article class="stat-card"><div class="stat-label">Next exam</div><div class="stat-value">' + (days === null ? '—' : days === 0 ? 'Today' : days + ' days') + '</div><div class="stat-foot">' + examText + '</div></article>' +
+          '<article class="stat-card"><div class="stat-label">Syllabus progress</div><div class="stat-value">' + pct + '%</div><div class="stat-foot">' + completed + ' of ' + total + ' topics fully marked done</div></article>' +
+          '<article class="stat-card"><div class="stat-label">Tasks left today</div><div class="stat-value">' + openToday + '</div><div class="stat-foot">' + todaysTasks.length + ' planned for today</div></article></div>';
+        var greetingName = state.profile && state.profile.displayName ? state.profile.displayName : "there";
+        var top = pageHeading("Good " + (new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening") + ", " + greetingName, "A clear plan for today makes exam week feel lighter.", '<button class="button" type="button" data-action="add-task">Add task</button><button class="button button-primary" type="button" data-action="build-plan">Build study plan</button>');
+        var calendar = monthCalendarMarkup();
+        var agenda = '<section class="panel agenda-panel" aria-label="Selected day plan">' + agendaMarkup(state.selectedDate) + '</section>';
+        var lower = '<div class="lower-grid"><section class="panel"><div class="panel-head"><div><h2>Upcoming exams</h2><p class="panel-subtitle">Keep the next papers in sight.</p></div><button class="button button-small" type="button" data-page="calendar">Open calendar</button></div><div class="exam-list">' + (exams.length ? exams.slice(0, 3).map(subjectSummaryMarkup).join("") : '<div class="empty-state">Add an exam date from Subjects.</div>') + '</div></section>' +
+          '<section class="panel"><div class="panel-head"><div><h2>Subject progress</h2><p class="panel-subtitle">Mark topics as you learn them.</p></div><button class="button button-small" type="button" data-page="subjects">View subjects</button></div><div class="subject-list">' + state.subjects.map(function (subject) {
+            var percent = subjectProgress(subject);
+            return '<div><div class="progress-line"><span class="subject-tag" style="--tag:' + esc(subject.color) + '"><i aria-hidden="true"></i>' + esc(subject.name) + '</span><strong>' + percent + '%</strong></div><div class="progress-track"><div class="progress-fill" style="width:' + percent + '%;background:' + esc(subject.color) + '"></div></div></div>';
+          }).join("") + '</div></section></div>';
+        return top + stats + '<div class="dashboard-grid">' + calendar + agenda + '</div>' + lower;
+      }
+      function renderCalendarPage() {
+        var top = pageHeading("Semester calendar", "Exams and study sessions together. Select any date to see its details.", '<button class="button button-primary" type="button" data-action="add-task">Add a study task</button>');
+        return top + '<div class="dashboard-grid">' + monthCalendarMarkup() + '<section class="panel agenda-panel" aria-label="Selected date details">' + agendaMarkup(state.selectedDate) + '</section></div>';
+      }
+      function renderSubjectsPage() {
+        var top = pageHeading("Your subjects", "Track topics and exam dates. Subject progress updates automatically as you mark topics done.", '<button class="button button-primary" type="button" data-action="add-subject">Add subject</button>');
+        return top + '<div class="subject-grid">' + state.subjects.map(subjectCardMarkup).join("") + '</div>';
+      }
+      function renderTasksPage() {
+        var filters = '<div class="filter-row">' +
+          '<button class="filter-button" type="button" data-filter="all" aria-pressed="' + (state.taskFilter === "all") + '">All tasks</button>' +
+          '<button class="filter-button" type="button" data-filter="open" aria-pressed="' + (state.taskFilter === "open") + '">To do</button>' +
+          '<button class="filter-button" type="button" data-filter="done" aria-pressed="' + (state.taskFilter === "done") + '">Completed</button></div>';
+        var tasks = state.tasks.slice().sort(function (a, b) { return a.date.localeCompare(b.date) || a.time.localeCompare(b.time); });
+        if (state.taskFilter === "open") tasks = tasks.filter(function (task) { return !task.completed; });
+        if (state.taskFilter === "done") tasks = tasks.filter(function (task) { return task.completed; });
+        var groups = {};
+        tasks.forEach(function (task) { if (!groups[task.date]) groups[task.date] = []; groups[task.date].push(task); });
+        var content = Object.keys(groups).map(function (date) {
+          var label = date === state.today ? "Today · " + dateLabel(date) : date === dayOffset(1) ? "Tomorrow · " + dateLabel(date) : dateLabel(date);
+          return '<section class="task-day-group"><h2 class="task-day-title">' + esc(label) + '</h2><div class="task-list">' + groups[date].map(taskMarkup).join("") + '</div></section>';
+        }).join("");
+        if (!content) content = '<div class="empty-state">No tasks in this filter yet.</div>';
+        var top = pageHeading("Study to-dos", "Every task is saved locally and can be moved or checked off.", '<button class="button button-primary" type="button" data-action="add-task">Add task</button>');
+        return top + '<div class="panel"><div class="tasks-toolbar"><div><h2>Your task list</h2><p class="panel-subtitle">Use the filters to focus on what matters.</p></div>' + filters + '</div>' + content + '</div>';
+      }
+      function renderProgressPage() {
+        var total = totalTopics(), done = doneTopics(), pct = overallProgress();
+        var completedTasks = state.tasks.filter(function (task) { return task.completed; }).length;
+        var plannedMinutes = state.tasks.reduce(function (sum, task) { return sum + Number(task.duration || 0); }, 0);
+        var bySubject = state.subjects.map(function (subject) {
+          var n = countTopics(subject, "done");
+          var percent = subjectProgress(subject);
+          return '<div class="progress-card"><div class="subject-tag" style="--tag:' + esc(subject.color) + '"><i aria-hidden="true"></i>' + esc(subject.name) + '</div><div class="progress-line"><span>' + n + ' of ' + subject.topics.length + ' topics done</span><strong>' + percent + '%</strong></div><div class="progress-track"><div class="progress-fill" style="width:' + percent + '%;background:' + esc(subject.color) + '"></div></div></div>';
+        }).join("");
+        var top = pageHeading("Your progress", "A simple view of syllabus coverage and the work you have completed.", "");
+        return top + '<div class="progress-layout"><section class="panel"><div class="panel-head"><div><h2>Semester coverage</h2><p class="panel-subtitle">Calculated from your topic marks across all subjects.</p></div><span class="countdown-chip">' + pct + '%</span></div><div class="progress-track" style="height:11px"><div class="progress-fill" style="width:' + pct + '%"></div></div><p class="page-description" style="font-size:14px;margin-top:10px">' + done + ' of ' + total + ' topics are fully marked done. Update topic statuses in Subjects to change progress.</p><div class="progress-summary" style="margin-top:18px"><div class="progress-card"><div class="stat-label">Tasks completed</div><div class="progress-number">' + completedTasks + '</div><div class="progress-detail">across your semester</div></div><div class="progress-card"><div class="stat-label">Planned study time</div><div class="progress-number">' + Math.floor(plannedMinutes / 60) + 'h ' + plannedMinutes % 60 + 'm</div><div class="progress-detail">from tasks in this demo</div></div></div></section><section class="panel"><div class="panel-head"><div><h2>By subject</h2><p class="panel-subtitle">Progress reflects topics marked done.</p></div></div><div class="subject-list">' + bySubject + '</div></section></div>';
+      }
+      function renderSettingsPage() {
+        var profile = state.profile || {};
+        var profileSummary = [profile.institutionType, profile.institutionName, profile.course, profile.yearLevel, profile.semester].filter(Boolean).join(" · ") || "Add your course and year details";
+        var top = pageHeading("Data & settings", "Your study workspace is local by default. Gemini is an optional online planner.", "");
+        var readyClass = apiKey ? " is-ready" : "";
+        var keyCard = '<section class="settings-card"><div class="panel-head"><div><h2>Gemini AI chat & planner</h2><p class="panel-subtitle">Optional · uses Google Gemini 3.5 Flash-Lite</p></div><span id="gemini-status-badge" class="api-status' + readyClass + '"><span class="api-status-dot" aria-hidden="true"></span>' + (apiKey ? "Key saved for this session" : "No key saved") + '</span></div><p>Get a key from <a class="api-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>, then save it here. This model currently has a free tier, with request limits and project eligibility set by Google. After saving, open the AI Chat tab in the main navigation.</p><div class="api-key-row"><div class="field"><label for="gemini-api-key">Your Gemini API key</label><input id="gemini-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your personal API key here" aria-describedby="gemini-key-note"></div><button class="button button-primary" type="button" data-action="save-api-key">Save for this session</button>' + (apiKey ? '<button class="button" type="button" data-action="clear-api-key">Clear</button>' : '') + '</div><p id="gemini-key-note" class="field-help">The key is kept in session storage for this app or browser session, not in your semester backup. Close the app or browser tab to clear it.</p><div class="api-disclosure">Chat sends your message plus subjects, exam dates, topic statuses, and upcoming open tasks to Google. The app excludes your name and college. Free-tier prompts may be used by Google to improve its products. Use a project with billing disabled if you want to avoid accidental paid API usage, and check your project’s quota. Gemini needs internet; the offline planner remains available.</div></section>';
+        var appearanceCard = '<section class="settings-card"><h2>Appearance</h2><p>Choose the theme that is easier to read. Your choice is saved on this device.</p><div class="settings-actions"><button class="button button-primary" type="button" data-action="toggle-theme">Switch to ' + (state.theme === "dark" ? "light" : "dark") + ' mode</button><span class="field-help" style="align-self:center">Current: ' + (state.theme === "dark" ? "Dark" : "Light") + '</span></div></section>';
+        return top + '<div class="settings-grid"><section class="settings-card"><h2>Student profile</h2><p>' + esc(profile.displayName ? profile.displayName + " · " : "") + esc(profileSummary) + '</p><div class="settings-actions"><button class="button" type="button" data-action="edit-profile">Edit profile</button></div></section>' + appearanceCard + keyCard + '<section class="settings-card"><h2>Local demo data</h2><p>Your profile, subjects, tasks, and progress are saved in this browser. They are not synced to another device. Export a JSON backup if you want to move your semester data.</p><div class="settings-actions"><button class="button button-primary" type="button" data-action="export">Export backup</button><button class="button" type="button" data-action="import">Import backup</button><input id="import-file" type="file" accept="application/json,.json" class="hidden"></div></section><section class="settings-card"><h2>Reset sample workspace</h2><p>Restore the sample subjects, exam dates, and tasks while keeping your student profile.</p><div class="settings-actions"><button class="button" type="button" data-action="reset">Restore sample data</button></div></section></div><div class="demo-note"><strong>Privacy</strong><span>AI Chat sends your message and study context only when you send it; the study planner sends selected subject details after you accept its notice. Your name and college details are excluded. Gemini requests need internet. All other study data stays on this device by default.</span></div>';
+      }
+      function chatStudyContext() {
+        return {
+          semester: state.profile && state.profile.semester || state.semester || "",
+          today: state.today,
+          subjects: state.subjects.map(function (subject) {
+            return { name: subject.name, exam_date: subject.examDate, exam_time: subject.examTime || "", topics: subject.topics.map(function (topic) { return { name: topic.name, status: topic.status }; }) };
+          }),
+          upcoming_open_tasks: state.tasks.filter(function (task) { return !task.completed && task.date >= state.today; }).sort(function (a, b) { return a.date.localeCompare(b.date) || a.time.localeCompare(b.time); }).slice(0, 20).map(function (task) {
+            return { title: task.title, subject: subjectName(task.subjectId), date: task.date, time: task.time, duration_minutes: task.duration };
+          })
+        };
+      }
+      function chatActionDescription(action) {
+        var subjectLabel = action.subject || "General";
+        if (action.type === "add_task") return "Add “" + action.title + "” for " + subjectLabel + " on " + action.date + " at " + action.time + " (" + action.duration_minutes + " min)";
+        if (action.type === "set_topic_status") return "Mark “" + action.topic + "” in " + subjectLabel + " as " + action.status;
+        if (action.type === "add_topic") return "Add “" + action.topic + "” to " + subjectLabel;
+        if (action.type === "remove_topic") return "Remove “" + action.topic + "” from " + subjectLabel;
+        return "Study workspace update";
+      }
+      function renderChatMessage(message, index) {
+        var role = message.role === "user" ? "user" : "assistant";
+        var html = '<article class="chat-message ' + role + (message.error ? ' chat-error' : '') + '"><div class="chat-message-label">' + (role === "user" ? "You" : "Semester Sathi AI") + '</div><div>' + esc(message.text) + '</div>';
+        if (role === "assistant" && message.pending && Array.isArray(message.actions) && message.actions.length) {
+          html += '<div class="chat-pending"><p class="chat-pending-title">Review these app changes</p><ul class="chat-proposal-list">' + message.actions.map(function (action) { return '<li>' + esc(chatActionDescription(action)) + '</li>'; }).join("") + '</ul><div class="chat-pending-actions"><button class="button button-primary button-small" type="button" data-action="apply-chat-actions" data-message-index="' + index + '">Apply changes</button><button class="button button-small" type="button" data-action="dismiss-chat-actions" data-message-index="' + index + '">Dismiss</button></div></div>';
+        } else if (role === "assistant" && message.applied) {
+          html += '<div class="chat-pending"><span class="field-help">Changes applied to your local study workspace.</span></div>';
+        } else if (role === "assistant" && message.dismissed && message.actions && message.actions.length) {
+          html += '<div class="chat-pending"><span class="field-help">Suggested changes dismissed.</span></div>';
+        }
+        return html + '</article>';
+      }
+      function renderChatPage() {
+        var top = pageHeading("Chat with your study AI", "Ask for explanations, revision advice, or changes to your study schedule.", '<button class="button button-small" type="button" data-action="clear-chat"' + (state.chatMessages.length ? '' : ' disabled') + '>Clear chat</button>');
+        var status = apiKey ? '<span class="chat-api-status">Gemini connected for this session · online</span>' : '<span class="chat-api-status">Add a Gemini key to start chatting</span>';
+        var feedContent = state.chatMessages.length ? state.chatMessages.map(renderChatMessage).join("") : '<div class="chat-empty"><div class="chat-empty-mark" aria-hidden="true">✦</div><h2>Your study assistant is ready</h2><p>Ask about a subject, request a revision plan, or tell it to add a study task. It will show proposed app changes here for you to approve.</p>' + (!apiKey ? '<button class="button button-primary" style="margin:16px auto 0" type="button" data-page="settings">Add API key in Data & settings</button>' : '') + '</div>';
+        var form = apiKey ? '<form id="chat-form" class="chat-compose"><div class="chat-compose-row"><textarea id="chat-input" name="message" maxlength="1200" placeholder="Ask about your subjects, or request a study task…" aria-label="Message Semester Sathi AI" required' + (chatLoading ? ' disabled' : '') + '></textarea><button class="button button-primary" type="submit"' + (chatLoading ? ' disabled' : '') + '>' + (chatLoading ? 'Thinking…' : 'Send') + '</button></div><div class="chat-compose-note"><span>Your message and study context are sent to Google using your key. Profile and college details are excluded.</span><span>AI changes require your approval · Enter to send</span></div></form>' : '<div class="chat-compose"><div class="chat-toolbar"><span class="field-help">The key you save in Data & settings unlocks Gemini chat here.</span><button class="button button-primary" type="button" data-page="settings">Open Data & settings</button></div></div>';
+        return top + '<div class="chat-toolbar">' + status + (chatLoading ? '<span class="chat-api-status">Gemini is replying…</span>' : '') + '</div><section class="panel chat-shell" aria-label="AI chat"><div id="chat-feed" class="chat-feed" aria-live="polite">' + feedContent + (chatLoading ? '<article class="chat-message assistant"><div class="chat-message-label">Semester Sathi AI</div><div>Thinking…</div></article>' : '') + '</div>' + form + '</section>';
+      }
+      function openOnboarding(editing) {
+        var profile = state.profile || {};
+        var root = document.getElementById("onboarding-root");
+        document.querySelector(".app-shell").style.display = "none";
+        var workspaceChoice = editing ? "" : '<div class="onboarding-mode"><div class="field-help">Choose what to start with. You can replace sample details any time.</div><label class="radio-option"><input type="radio" name="workspaceMode" value="sample" checked><span><strong>Load sample semester</strong><small>Includes example subjects, exam dates, and study tasks.</small></span></label><label class="radio-option"><input type="radio" name="workspaceMode" value="blank"><span><strong>Start with an empty semester</strong><small>Add your own subjects and exam dates from scratch.</small></span></label></div>';
+        root.innerHTML = '<div class="onboarding-shell"><section class="onboarding-card"><aside class="onboarding-aside"><div><div class="brand"><div class="brand-mark" aria-hidden="true">S</div><div><div class="brand-name">Semester Sathi</div><div class="brand-subtitle">Your semester planner</div></div></div><div class="onboarding-pitch"><p class="onboarding-step">Your study workspace</p><h1>Make semester planning feel manageable.</h1><p>Set up your basics once. Your exam calendar, study topics, and daily plan will be ready in one place.</p><div class="onboarding-points"><span>Exam calendar</span><span>Topic progress</span><span>Flexible plans</span></div></div></div><p class="onboarding-aside-note">Your semester details stay in this browser. Gemini is optional and only receives planning details when you choose it.</p></aside><div class="onboarding-main"><div class="onboarding-step">' + (editing ? "Update your details" : "First-time setup") + '</div><h2>' + (editing ? "Edit student profile" : "Tell us a little about your studies") + '</h2><p class="onboarding-description">Required fields help label your workspace. Add only what you want; all of this stays on this device.</p><form id="profile-form" class="onboarding-form"><div class="form-grid"><div class="field"><label for="profile-name">What should we call you? <span class="field-help">Optional</span></label><input id="profile-name" name="displayName" maxlength="40" value="' + esc(profile.displayName || "") + '" placeholder="Your name"></div><div class="field"><label for="profile-kind">Study level</label><select id="profile-kind" name="institutionType" required><option value="">Choose one</option><option' + (profile.institutionType === "School" ? " selected" : "") + '>School</option><option' + (profile.institutionType === "College" ? " selected" : "") + '>College</option><option' + (profile.institutionType === "University" ? " selected" : "") + '>University</option><option' + (profile.institutionType === "Other" ? " selected" : "") + '>Other</option></select></div><div class="field"><label for="profile-institution">School / college name <span class="field-help">Optional</span></label><input id="profile-institution" name="institutionName" maxlength="70" value="' + esc(profile.institutionName || "") + '" placeholder="Institution name"></div><div class="field"><label for="profile-course">Course / stream <span class="field-help">Optional</span></label><input id="profile-course" name="course" maxlength="60" value="' + esc(profile.course || "") + '" placeholder="e.g. BSc Computer Science"></div><div class="field"><label for="profile-year">Class or current year</label><input id="profile-year" name="yearLevel" maxlength="40" value="' + esc(profile.yearLevel || "") + '" placeholder="e.g. Class 12 or Year 2" required></div><div class="field"><label for="profile-semester">Semester / term <span class="field-help">Optional</span></label><input id="profile-semester" name="semester" maxlength="40" value="' + esc(profile.semester || "") + '" placeholder="e.g. Semester 3"></div></div>' + workspaceChoice + '<div class="modal-actions"><button class="button onboarding-submit button-primary" type="submit">' + (editing ? "Save profile" : "Create my workspace") + '</button>' + (editing ? '<button class="button" type="button" data-action="cancel-profile">Cancel</button>' : '') + '</div></form><p class="privacy-note">No account or server is needed. Your class, college, and name are never sent to Gemini by the study planner.</p></div></section></div>';
+        document.getElementById("profile-form").addEventListener("submit", function (event) {
+          event.preventDefault();
+          var form = new FormData(event.currentTarget);
+          var nextProfile = { displayName: String(form.get("displayName") || "").trim(), institutionType: String(form.get("institutionType") || ""), institutionName: String(form.get("institutionName") || "").trim(), course: String(form.get("course") || "").trim(), yearLevel: String(form.get("yearLevel") || "").trim(), semester: String(form.get("semester") || "").trim() };
+          if (!nextProfile.institutionType || !nextProfile.yearLevel) return;
+          if (!editing) {
+            if (form.get("workspaceMode") === "blank") { state.subjects = []; state.tasks = []; state.page = "subjects"; }
+            else {
+              if (!state.subjects.length) {
+                var starter = sampleState();
+                state.subjects = starter.subjects;
+                state.tasks = starter.tasks;
+                state.today = starter.today;
+                state.selectedDate = starter.today;
+                state.viewMonth = starter.viewMonth;
+              }
+              state.page = "overview";
+            }
+          }
+          state.today = localISO(new Date());
+          state.profile = nextProfile;
+          state.semester = nextProfile.semester || nextProfile.yearLevel;
+          saveState();
+          render();
+          showToast(editing ? "Student profile updated." : "Your study workspace is ready.");
+        });
+      }
+      function render() {
+        applyTheme();
+        if (!state.profile || typeof state.profile !== "object") { openOnboarding(false); refreshApiStatus(); return; }
+        document.querySelector(".app-shell").style.display = "";
+        document.getElementById("onboarding-root").innerHTML = "";
+        var initial = (state.profile.displayName || "S").trim().charAt(0).toUpperCase() || "S";
+        document.getElementById("avatar-initial").textContent = initial;
+        refreshApiStatus();
+        var page = pageNames[state.page] ? state.page : "overview";
+        state.page = page;
+        document.querySelectorAll("[data-page]").forEach(function (button) {
+          if (button.tagName === "BUTTON" && button.classList.contains("nav-button")) {
+            button.setAttribute("aria-current", button.dataset.page === page ? "page" : "false");
+          }
+        });
+        document.getElementById("top-caption").textContent = pageNames[page][0] + " · " + pageNames[page][1];
+        var html = page === "overview" ? renderOverview() : page === "calendar" ? renderCalendarPage() :
+          page === "subjects" ? renderSubjectsPage() : page === "tasks" ? renderTasksPage() : page === "chat" ? renderChatPage() :
+          page === "progress" ? renderProgressPage() : renderSettingsPage();
+        document.getElementById("main-content").innerHTML = html;
+        if (page === "chat") {
+          var chatFeed = document.getElementById("chat-feed");
+          if (chatFeed) chatFeed.scrollTop = chatFeed.scrollHeight;
+        }
+      }
+      function applyTheme() {
+        var theme = state.theme === "dark" ? "dark" : "light";
+        document.documentElement.dataset.theme = theme;
+        var themeMeta = document.querySelector('meta[name="theme-color"]');
+        if (themeMeta) themeMeta.setAttribute("content", theme === "dark" ? "#111a16" : "#f4f7f5");
+      }
+      function setPage(page) {
+        if (!pageNames[page]) return;
+        state.page = page;
+        saveState();
+        render();
+      }
+      function showToast(message) {
+        var root = document.getElementById("toast-root");
+        root.innerHTML = '<div class="toast" role="status">' + esc(message) + '</div>';
+        window.clearTimeout(showToast.timer);
+        showToast.timer = window.setTimeout(function () { root.innerHTML = ""; }, 3600);
+      }
+      function closeModal() { document.getElementById("modal-root").innerHTML = ""; }
+      function modalFrame(title, copy, body, actions) {
+        document.getElementById("modal-root").innerHTML = '<div class="modal-backdrop" data-action="backdrop"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal-head"><div><h2 id="modal-title">' + esc(title) + '</h2><p class="modal-copy">' + esc(copy) + '</p></div><button class="icon-button" type="button" data-action="close-modal" aria-label="Close dialog">×</button></div>' + body + actions + '</section></div>';
+      }
+      function getPlanInputs() {
+        var subject = subjectById(document.getElementById("plan-subject").value);
+        var days = Math.max(1, Math.min(30, Number(document.getElementById("plan-days").value || 7)));
+        var hours = Math.max(.5, Math.min(8, Number(document.getElementById("plan-hours").value || 2)));
+        if (!subject) { showToast("Add a subject before building a study plan."); return null; }
+        var examWindow = daysBetween(state.today, subject.examDate);
+        var startOffset = examWindow > 1 ? 1 : 0;
+        var span = Math.max(1, examWindow > 1 ? Math.min(days, examWindow - 1) : 1);
+        return { subject: subject, days: days, hours: hours, span: span, startOffset: startOffset, startDate: dayOffset(startOffset), pending: subject.topics.filter(function (topic) { return topic.status !== "done"; }) };
+      }
+      function clearOldGenerated(subjectId) {
+        state.tasks = state.tasks.filter(function (task) {
+          var remove = task.generated && task.subjectId === subjectId && !task.completed;
+          if (remove) cancelNativeReminder(task.id);
+          return !remove;
+        });
+      }
+      function finishPlan(subject, firstDate, count, remaining) {
+        state.selectedDate = firstDate;
+        state.viewMonth = state.selectedDate.slice(0, 7);
+        state.page = "tasks";
+        saveState();
+        closeModal();
+        render();
+        showToast(count + " study sessions added for " + subject.name + (remaining ? ". " + remaining + " topics remain for later." : "."));
+      }
+      function generateOfflinePlan() {
+        var plan = getPlanInputs();
+        if (!plan) return;
+        clearOldGenerated(plan.subject.id);
+        var duration = Math.min(45, Math.floor(plan.hours * 60 / 15) * 15);
+        var slotsPerDay = Math.min(3, Math.max(1, Math.floor(plan.hours * 60 / duration)));
+        var selectedTopics = plan.pending.slice(0, plan.span * slotsPerDay);
+        selectedTopics.forEach(function (topic, index) {
+          var dayIndex = Math.floor(index / slotsPerDay);
+          var date = dayOffset(dayIndex + plan.startOffset);
+          var slot = index % slotsPerDay;
+          var plannedTask = { id: uid(), title: "Study " + topic.name, subjectId: plan.subject.id, date: date, time: findAvailableTime(date, 9 + slot * 2, duration), duration: duration, type: "Study plan", completed: false, generated: true, reminderEnabled: true };
+          state.tasks.push(plannedTask);
+          scheduleNativeReminder(plannedTask);
+        });
+        var reviewDate = dayOffset(plan.startOffset + Math.max(0, plan.span - 1));
+        var reviewDayTopics = selectedTopics.length ? (selectedTopics.length - 1) % slotsPerDay + 1 : 0;
+        var addedReview = 0;
+        if (30 <= plan.hours * 60 && reviewDayTopics * duration + 30 <= plan.hours * 60) {
+          var reviewTask = { id: uid(), title: "Review key points and mistakes", subjectId: plan.subject.id, date: reviewDate, time: findAvailableTime(reviewDate, 18, 30), duration: 30, type: "Review", completed: false, generated: true, reminderEnabled: true };
+          state.tasks.push(reviewTask);
+          scheduleNativeReminder(reviewTask);
+          addedReview = 1;
+        }
+        finishPlan(plan.subject, dayOffset(plan.startOffset), selectedTopics.length + addedReview, Math.max(0, plan.pending.length - selectedTopics.length));
+      }
+      function interactionText(data) {
+        if (typeof data.output_text === "string" && data.output_text) return data.output_text;
+        var steps = Array.isArray(data.steps) ? data.steps : [];
+        for (var i = steps.length - 1; i >= 0; i--) {
+          if (steps[i].type === "model_output" && Array.isArray(steps[i].content)) {
+            var text = steps[i].content.filter(function (part) { return part.type === "text"; }).map(function (part) { return part.text; }).join("\n");
+            if (text) return text;
+          }
+        }
+        return "";
+      }
+      function normalizeChatActions(actions) {
+        if (!Array.isArray(actions)) return [];
+        var accepted = [];
+        actions.slice(0, 5).forEach(function (raw) {
+          if (!raw || typeof raw !== "object") return;
+          var action = { type: String(raw.type || "").trim() };
+          var subjectLabel = String(raw.subject || "").trim();
+          var subject = subjectLabel ? state.subjects.find(function (item) { return item.name.toLowerCase() === subjectLabel.toLowerCase(); }) : null;
+          if (action.type === "add_task") {
+            var title = String(raw.title || "").trim().slice(0, 100);
+            var date = String(raw.date || "").trim();
+            var time = String(raw.time || "").trim();
+            var duration = Number(raw.duration_minutes);
+            if (!title || (subjectLabel && !subject) || !/^\d{4}-\d{2}-\d{2}$/.test(date) || localISO(parseLocal(date)) !== date || date < state.today) return;
+            if (!/^\d{2}:\d{2}$/.test(time) || Number(time.slice(0, 2)) > 23 || Number(time.slice(3)) > 59 || !Number.isInteger(duration) || duration < 5 || duration > 240) return;
+            accepted.push({ type: action.type, subject: subject ? subject.name : "", subjectId: subject ? subject.id : "", title: title, date: date, time: time, duration_minutes: duration });
+            return;
+          }
+          if (!subject) return;
+          if (action.type === "set_topic_status") {
+            var topicLabel = String(raw.topic || "").trim();
+            var topic = subject.topics.find(function (item) { return item.name.toLowerCase() === topicLabel.toLowerCase(); });
+            var status = String(raw.status || "").trim();
+            if (!topic || !["not-started", "in-progress", "done"].includes(status)) return;
+            accepted.push({ type: action.type, subject: subject.name, subjectId: subject.id, topic: topic.name, status: status });
+          } else if (action.type === "add_topic") {
+            var newTopic = String(raw.topic || "").trim().slice(0, 80);
+            if (!newTopic || subject.topics.some(function (item) { return item.name.toLowerCase() === newTopic.toLowerCase(); })) return;
+            accepted.push({ type: action.type, subject: subject.name, subjectId: subject.id, topic: newTopic });
+          }
+        });
+        return accepted;
+      }
+      function chatActionSchema() {
+        return {
+          type: "object",
+          properties: {
+            reply: { type: "string" },
+            actions: { type: "array", items: { type: "object", properties: {
+              type: { type: "string" }, subject: { type: "string" }, title: { type: "string" },
+              date: { type: "string" }, time: { type: "string" }, duration_minutes: { type: "integer" },
+              topic: { type: "string" }, status: { type: "string" }
+            }, required: ["type"] } }
+          },
+          required: ["reply", "actions"]
+        };
+      }
+      async function sendGeminiChat() {
+        if (!apiKey) { showToast("Save your Gemini key in Data & settings first."); return; }
+        var input = document.getElementById("chat-input");
+        var userText = input && input.value.trim();
+        if (!userText || chatLoading) return;
+        state.chatMessages.push({ role: "user", text: userText });
+        state.chatMessages = state.chatMessages.slice(-60);
+        chatLoading = true;
+        saveState();
+        render();
+        var recent = state.chatMessages.slice(-12).map(function (message) {
+          return (message.role === "user" ? "Student" : "Assistant") + ": " + message.text;
+        }).join("\n");
+        var prompt = "You are Semester Sathi, a concise and supportive study assistant. Answer questions naturally and use the supplied study context when relevant. Do not claim that app data changed unless you include a proposed action. You may suggest these app changes: add_task, set_topic_status, or add_topic. Use exact subject and topic names from the context. Dates must use YYYY-MM-DD, times HH:MM (24-hour), and task durations 5 to 240 minutes. Suggest at most 5 actions. For an action that does not match a real subject/topic or valid date, do not include it. Never output code or arbitrary commands. Always return JSON with a helpful reply and an actions array; use an empty actions array when no app change is needed. Current app context (no student name or college details): " + JSON.stringify(chatStudyContext()) + "\n\nRecent conversation:\n" + recent;
+        try {
+          var response = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+            body: JSON.stringify({ model: "gemini-3.5-flash-lite", input: prompt, store: false, response_format: { type: "text", mime_type: "application/json", schema: chatActionSchema() } })
+          });
+          var data = await response.json();
+          if (!response.ok) {
+            if (response.status === 429) throw new Error("Gemini's free quota or rate limit was reached. Check your AI Studio usage, or try later.");
+            if (response.status === 400 || response.status === 403) throw new Error("Gemini could not use this key or model for the current project. Check the key and its access.");
+            throw new Error("Gemini request failed. Check your connection and try again.");
+          }
+          var rawText = interactionText(data).trim();
+          if (!rawText) throw new Error("Gemini returned an empty reply. Please try again.");
+          var result;
+          try { result = JSON.parse(rawText); }
+          catch (parseError) { result = { reply: rawText, actions: [] }; }
+          var reply = String(result.reply || "").trim().slice(0, 4000);
+          var actions = normalizeChatActions(result.actions);
+          state.chatMessages.push({ role: "assistant", text: reply || "I couldn't form a reply. Please try asking again.", actions: actions, pending: actions.length > 0 });
+        } catch (error) {
+          state.chatMessages.push({ role: "assistant", text: error && error.message ? error.message : "Gemini could not reply. Check your connection and try again.", error: true });
+        } finally {
+          state.chatMessages = state.chatMessages.slice(-60);
+          chatLoading = false;
+          saveState();
+          render();
+        }
+      }
+      function applyChatActions(messageIndex) {
+        var message = state.chatMessages[messageIndex];
+        if (!message || !message.pending || !Array.isArray(message.actions)) return;
+        message.actions.forEach(function (action) {
+          if (action.type === "add_task") {
+            var task = { id: uid(), title: action.title, subjectId: action.subjectId, date: action.date, time: action.time, duration: action.duration_minutes, type: "AI chat study task", completed: false, generated: true, reminderEnabled: true };
+            state.tasks.push(task);
+            scheduleNativeReminder(task);
+          } else if (action.type === "set_topic_status") {
+            var statusSubject = subjectById(action.subjectId);
+            var statusTopic = statusSubject && statusSubject.topics.find(function (item) { return item.name === action.topic; });
+            if (statusTopic) statusTopic.status = action.status;
+          } else if (action.type === "add_topic") {
+            var addSubject = subjectById(action.subjectId);
+            if (addSubject && !addSubject.topics.some(function (item) { return item.name.toLowerCase() === action.topic.toLowerCase(); })) {
+              addSubject.topics.push({ name: action.topic, status: "not-started" });
+            }
+          }
+        });
+        message.pending = false;
+        message.applied = true;
+        saveState();
+        render();
+        showToast("AI changes applied to your study workspace.");
+      }
+      async function generateGeminiPlan(button) {
+        var plan = getPlanInputs();
+        if (!plan) return;
+        if (!apiKey) { showToast("Add your Gemini key in Data & settings first, or use the offline planner."); return; }
+        if (!document.getElementById("gemini-consent").checked) { showToast("Please accept the data notice before using Gemini."); return; }
+        if (!plan.pending.length) { showToast("All topics are marked done. Use the offline planner for a review session."); return; }
+        var requestDetails = {
+          subject: plan.subject.name,
+          exam_date: plan.subject.examDate,
+          start_date: plan.startDate,
+          planning_days: plan.span,
+          available_hours_per_day: plan.hours,
+          pending_topics: plan.pending.map(function (topic) { return topic.name; })
+        };
+        var prompt = "Create a practical student study plan. Use only the pending topic names supplied; do not invent syllabus topics. Keep each day's study duration within available_hours_per_day. Schedule sessions before the exam. day_offset 0 means start_date; day_offset must be from 0 through planning_days - 1. Prefer short focused sessions, generally 30 to 60 minutes. Return JSON matching the requested schema. Plan data: " + JSON.stringify(requestDetails);
+        var schema = { type: "object", properties: { plan_title: { type: "string" }, summary: { type: "string" }, sessions: { type: "array", items: { type: "object", properties: { day_offset: { type: "integer" }, start_time: { type: "string" }, duration_minutes: { type: "integer" }, topic: { type: "string" }, task_title: { type: "string" } }, required: ["day_offset", "start_time", "duration_minutes", "topic", "task_title"] } } }, required: ["plan_title", "summary", "sessions"] };
+        button.classList.add("loading-button");
+        button.disabled = true;
+        button.textContent = "Planning…";
+        try {
+          var response = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+            body: JSON.stringify({ model: "gemini-3.5-flash-lite", input: prompt, store: false, response_format: { type: "text", mime_type: "application/json", schema: schema } })
+          });
+          var data = await response.json();
+          if (!response.ok) {
+            var code = data && data.error && data.error.code;
+            if (response.status === 429) throw new Error("Gemini's free quota or rate limit was reached. Check your AI Studio usage, or use the offline planner.");
+            if (response.status === 400 || response.status === 403) throw new Error("Gemini could not use this key or model for the current project. Check your AI Studio key and free-tier access.");
+            throw new Error("Gemini request failed" + (code ? " (" + code + ")" : "") + ". Try again or use the offline planner.");
+          }
+          var rawText = interactionText(data).replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+          if (!rawText) throw new Error("Gemini returned an empty plan. Try the offline planner.");
+          var result;
+          try { result = JSON.parse(rawText); }
+          catch (parseError) { throw new Error("Gemini returned a plan that could not be read. Try the offline planner."); }
+          if (!Array.isArray(result.sessions)) throw new Error("Gemini returned an unexpected plan. Try the offline planner.");
+          var pendingNames = plan.pending.map(function (topic) { return topic.name; });
+          var dailyMinutes = {};
+          var accepted = result.sessions.filter(function (session) {
+            var offset = Number(session.day_offset), duration = Number(session.duration_minutes);
+            if (!Number.isInteger(offset) || offset < 0 || offset >= plan.span) return false;
+            if (!pendingNames.includes(session.topic) || !Number.isInteger(duration) || duration < 20 || duration > 90) return false;
+            if (!/^\d{2}:\d{2}$/.test(session.start_time) || Number(session.start_time.slice(0, 2)) > 23 || Number(session.start_time.slice(3)) > 59) return false;
+            if ((dailyMinutes[offset] || 0) + duration > plan.hours * 60) return false;
+            dailyMinutes[offset] = (dailyMinutes[offset] || 0) + duration;
+            return true;
+          });
+          if (!accepted.length) throw new Error("Gemini returned no usable sessions. Try the offline planner or adjust the study hours.");
+          clearOldGenerated(plan.subject.id);
+          accepted.forEach(function (session) {
+            var offset = Number(session.day_offset);
+            var date = dayOffset(plan.startOffset + offset);
+            var preferredHour = Number(session.start_time.slice(0, 2));
+            var duration = Number(session.duration_minutes);
+            var title = String(session.task_title || "Study " + session.topic).slice(0, 100);
+            var plannedTask = { id: uid(), title: title, subjectId: plan.subject.id, date: date, time: findAvailableTime(date, preferredHour, duration), duration: duration, type: "Gemini study plan", completed: false, generated: true, reminderEnabled: true };
+            state.tasks.push(plannedTask);
+            scheduleNativeReminder(plannedTask);
+          });
+          finishPlan(plan.subject, dayOffset(plan.startOffset), accepted.length, Math.max(0, plan.pending.length - accepted.length));
+        } catch (error) {
+          showToast(error && error.message ? error.message : "Gemini could not build a plan. Use the offline planner.");
+        } finally {
+          if (button.isConnected) { button.classList.remove("loading-button"); button.disabled = false; button.textContent = "Generate with Gemini"; }
+        }
+      }
+      function openPlanModal() {
+        if (!state.subjects.length) { showToast("Add at least one subject before building a study plan."); state.page = "subjects"; render(); return; }
+        var options = state.subjects.map(function (subject) { return '<option value="' + esc(subject.id) + '">' + esc(subject.name) + ' · exam ' + esc(dateLabel(subject.examDate)) + '</option>'; }).join("");
+        var body = '<form id="plan-form"><div class="form-grid"><div class="field field-full"><label for="plan-subject">Subject</label><select id="plan-subject" name="subjectId" required>' + options + '</select></div>' +
+          '<div class="field"><label for="plan-days">Plan length (days)</label><input id="plan-days" name="days" type="number" min="1" max="30" value="7" required></div>' +
+          '<div class="field"><label for="plan-hours">Study hours per day</label><input id="plan-hours" name="hours" type="number" min="0.5" max="8" step="0.5" value="2" required></div>' +
+          '<div class="field field-full"><span class="field-help">Offline planner: runs on this device and works without internet. Gemini can make a more tailored plan, but needs internet and a saved API key.</span></div></div>' +
+          '<label class="consent-row"><input id="gemini-consent" type="checkbox"><span>For Gemini only: I agree to send this subject, unfinished topics, exam date, and study limits to Google. Free-tier content may be used to improve Google products. My name and college details are not included.</span></label>' +
+          '<div class="modal-actions"><button class="button" type="button" data-action="close-modal">Cancel</button><button class="button" type="button" data-action="generate-offline">Use offline planner</button><button id="generate-gemini-button" class="button button-primary" type="button" data-action="generate-ai">Generate with Gemini</button></div></form>';
+        modalFrame("Build a study plan", "Choose the local planner or opt in to an AI-generated plan.", body, "");
+      }
+      function openTaskModal(date) {
+        var options = '<option value="">General task</option>' + state.subjects.map(function (subject) { return '<option value="' + esc(subject.id) + '">' + esc(subject.name) + '</option>'; }).join("");
+        var body = '<form id="task-form"><div class="form-grid"><div class="field field-full"><label for="task-title-input">Task</label><input id="task-title-input" name="title" type="text" maxlength="100" placeholder="e.g. Revise Chapter 3" required></div>' +
+          '<div class="field"><label for="task-subject-input">Subject</label><select id="task-subject-input" name="subjectId">' + options + '</select></div>' +
+          '<div class="field"><label for="task-type-input">Task type</label><select id="task-type-input" name="type"><option>Study</option><option>Revision</option><option>Practice</option><option>Assignment</option><option>Reading</option></select></div>' +
+          '<div class="field"><label for="task-date-input">Date</label><input id="task-date-input" name="date" type="date" value="' + esc(date || state.selectedDate || state.today) + '" required></div>' +
+          '<div class="field"><label for="task-time-input">Time</label><input id="task-time-input" name="time" type="time" value="16:00" required></div>' +
+          '<div class="field"><label for="task-duration-input">Duration (minutes)</label><input id="task-duration-input" name="duration" type="number" min="5" max="240" step="5" value="45" required></div>' +
+          '<label class="consent-row field-full hidden" data-native-reminder><input id="task-reminder-input" type="checkbox" checked><span>Remind me on this phone at the task time. Android may delay reminders slightly to save battery.</span></label></div>' +
+          '<div class="modal-actions"><button class="button" type="button" data-action="close-modal">Cancel</button><button class="button button-primary" type="submit">Save task</button></div></form>';
+        modalFrame("Add a study task", "Add it to your calendar and task list.", body, "");
+        if (window.Android && typeof window.Android.scheduleReminder === "function") document.querySelector("[data-native-reminder]").classList.remove("hidden");
+        document.getElementById("task-form").addEventListener("submit", function (event) {
+          event.preventDefault();
+          var title = document.getElementById("task-title-input").value.trim();
+          if (!title) return;
+          var reminderToggle = document.getElementById("task-reminder-input");
+          var newTask = { id: uid(), title: title, subjectId: document.getElementById("task-subject-input").value, date: document.getElementById("task-date-input").value, time: document.getElementById("task-time-input").value, duration: Number(document.getElementById("task-duration-input").value), type: document.getElementById("task-type-input").value, completed: false, generated: false, reminderEnabled: !!(window.Android && reminderToggle && reminderToggle.checked) };
+          state.tasks.push(newTask);
+          scheduleNativeReminder(newTask);
+          state.selectedDate = document.getElementById("task-date-input").value;
+          state.viewMonth = state.selectedDate.slice(0, 7);
+          state.page = "calendar";
+          saveState();
+          closeModal();
+          render();
+          showToast("Task saved in this browser.");
+        });
+        document.getElementById("task-title-input").focus();
+      }
+      function openSubjectModal() {
+        var body = '<form id="subject-form"><div class="form-grid"><div class="field field-full"><label for="subject-name-input">Subject name</label><input id="subject-name-input" name="name" type="text" maxlength="50" placeholder="e.g. Biology" required></div>' +
+          '<div class="field"><label for="subject-code-input">Course code (optional)</label><input id="subject-code-input" name="code" type="text" maxlength="20" placeholder="BIO 204"></div>' +
+          '<div class="field"><label for="subject-exam-date">Exam date</label><input id="subject-exam-date" name="examDate" type="date" value="' + esc(dayOffset(14)) + '" required></div>' +
+          '<div class="field"><label for="subject-exam-time">Exam time</label><input id="subject-exam-time" name="examTime" type="time" value="10:00"></div>' +
+          '<div class="field"><label for="subject-room">Room / venue</label><input id="subject-room" name="room" type="text" maxlength="50" placeholder="Exam hall"></div>' +
+          '<div class="field field-full"><label for="subject-topics-input">Chapters / lessons</label><textarea id="subject-topics-input" name="topics" placeholder="One chapter or lesson per line"></textarea><span class="field-help">You can add or remove chapters later from the subject card.</span></div></div>' +
+          '<div class="modal-actions"><button class="button" type="button" data-action="close-modal">Cancel</button><button class="button button-primary" type="submit">Save subject</button></div></form>';
+        modalFrame("Add a subject", "Set its paper date and add syllabus topics.", body, "");
+        document.getElementById("subject-form").addEventListener("submit", function (event) {
+          event.preventDefault();
+          var name = document.getElementById("subject-name-input").value.trim();
+          var topics = document.getElementById("subject-topics-input").value.split(/\r?\n/).map(function (topic) { return topic.trim(); }).filter(Boolean).map(function (topic) { return { name: topic, status: "not-started" }; });
+          if (!name) return;
+          var colors = ["#8b6bb0", "#d17658", "#478a93", "#bd9b38"];
+          state.subjects.push({ id: uid(), name: name, code: document.getElementById("subject-code-input").value.trim(), examDate: document.getElementById("subject-exam-date").value, examTime: document.getElementById("subject-exam-time").value, room: document.getElementById("subject-room").value.trim(), color: colors[state.subjects.length % colors.length], topics: topics });
+          state.page = "subjects";
+          saveState();
+          closeModal();
+          render();
+          showToast(name + " added to your semester.");
+        });
+        document.getElementById("subject-name-input").focus();
+      }
+      function openTopicModal(subjectId) {
+        var subject = subjectById(subjectId);
+        if (!subject) return;
+        var body = '<form id="topic-form"><div class="field"><label for="topic-names-input">Chapters or lessons</label><textarea id="topic-names-input" name="topics" placeholder="One chapter or lesson per line" required></textarea><span class="field-help">Each line becomes a separate item with its own progress mark.</span></div><div class="modal-actions"><button class="button" type="button" data-action="close-modal">Cancel</button><button class="button button-primary" type="submit">Add to ' + esc(subject.name) + '</button></div></form>';
+        modalFrame("Add chapters or lessons", "Add one item or paste a list. Your additions are saved on this device.", body, "");
+        document.getElementById("topic-form").addEventListener("submit", function (event) {
+          event.preventDefault();
+          var names = document.getElementById("topic-names-input").value.split(/\r?\n/).map(function (topic) { return topic.trim(); }).filter(Boolean);
+          if (!names.length) { showToast("Enter at least one chapter or lesson."); return; }
+          names.forEach(function (name) { subject.topics.push({ name: name, status: "not-started" }); });
+          saveState(); closeModal(); render();
+          showToast(names.length + (names.length === 1 ? " chapter or lesson added." : " chapters or lessons added."));
+        });
+        document.getElementById("topic-names-input").focus();
+      }
+      function openRemoveTopicModal(subjectId, topicIndex) {
+        var subject = subjectById(subjectId);
+        var topic = subject && subject.topics[topicIndex];
+        if (!topic) return;
+        var body = '<p class="field-help">Remove “' + esc(topic.name) + '” from ' + esc(subject.name) + '? Any calendar tasks already linked to it will stay in your plan.</p>';
+        var actions = '<div class="modal-actions"><button class="button" type="button" data-action="close-modal">Keep it</button><button class="button" type="button" data-action="confirm-remove-topic" data-subject="' + esc(subject.id) + '" data-topic-index="' + topicIndex + '" style="border-color:var(--red);color:var(--red)">Remove item</button></div>';
+        modalFrame("Remove this chapter or lesson?", "This only removes it from the subject syllabus.", body, actions);
+      }
+      function exportBackup() {
+        var blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement("a");
+        link.href = url; link.download = "semester-sathi-backup.json";
+        document.body.appendChild(link); link.click(); link.remove();
+        URL.revokeObjectURL(url);
+        showToast("Backup exported as a JSON file.");
+      }
+      function importBackup(file) {
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          try {
+            var imported = JSON.parse(String(reader.result));
+            if (!imported || !Array.isArray(imported.subjects) || !Array.isArray(imported.tasks)) throw new Error("Invalid backup");
+            if (!Array.isArray(imported.chatMessages)) imported.chatMessages = [];
+            imported.chatMessages = imported.chatMessages.filter(function (message) { return message && (message.role === "user" || message.role === "assistant") && typeof message.text === "string"; }).slice(-60);
+            imported.subjects.forEach(function (subject) { delete subject.progressOverride; });
+            state = imported;
+            saveState(); render(); showToast("Backup restored in this browser.");
+          } catch (e) { showToast("That file is not a valid Semester Sathi backup."); }
+        };
+        reader.readAsText(file);
+      }
+      function resetDemo() {
+        var profile = state.profile;
+        state = sampleState();
+        state.profile = profile;
+        state.semester = profile && (profile.semester || profile.yearLevel) || state.semester;
+        saveState();
+        closeModal();
+        render();
+        showToast("Sample semester restored.");
+      }
+
+      document.addEventListener("click", function (event) {
+        var pageButton = event.target.closest("[data-page]");
+        if (pageButton) { setPage(pageButton.dataset.page); return; }
+        var dateButton = event.target.closest("[data-date]");
+        if (dateButton && dateButton.classList.contains("calendar-day")) {
+          state.selectedDate = dateButton.dataset.date;
+          state.viewMonth = state.selectedDate.slice(0, 7);
+          saveState(); render(); return;
+        }
+        var topicButton = event.target.closest("[data-topic]");
+        if (topicButton) {
+          var key = topicButton.dataset.topic.split(":");
+          var subject = subjectById(key[0]);
+          var topic = subject && subject.topics[Number(key[1])];
+          if (topic) {
+            var cycle = ["not-started", "in-progress", "done"];
+            topic.status = cycle[(cycle.indexOf(topic.status) + 1) % cycle.length];
+            saveState(); render();
+          }
+          return;
+        }
+        var filterButton = event.target.closest("[data-filter]");
+        if (filterButton) { state.taskFilter = filterButton.dataset.filter; saveState(); render(); return; }
+        var action = event.target.closest("[data-action]");
+        if (!action) return;
+        var name = action.dataset.action;
+        if (name === "build-plan") openPlanModal();
+        else if (name === "generate-offline") generateOfflinePlan();
+        else if (name === "generate-ai") generateGeminiPlan(document.getElementById("generate-gemini-button"));
+        else if (name === "apply-chat-actions") applyChatActions(Number(action.dataset.messageIndex));
+        else if (name === "dismiss-chat-actions") {
+          var dismissedMessage = state.chatMessages[Number(action.dataset.messageIndex)];
+          if (dismissedMessage && dismissedMessage.pending) { dismissedMessage.pending = false; dismissedMessage.dismissed = true; saveState(); render(); }
+        }
+        else if (name === "clear-chat") {
+          state.chatMessages = [];
+          saveState(); render(); showToast("Chat history cleared from this device.");
+        }
+        else if (name === "edit-profile") openOnboarding(true);
+        else if (name === "cancel-profile") render();
+        else if (name === "save-api-key") {
+          var enteredKey = document.getElementById("gemini-api-key").value.trim();
+          if (!enteredKey) { showToast("Paste your Gemini API key first."); return; }
+          apiKey = enteredKey;
+          try { sessionStorage.setItem("semester-sathi-gemini-key", apiKey); } catch (e) { }
+          render();
+          showToast("Gemini key saved for this session.");
+        }
+        else if (name === "clear-api-key") {
+          apiKey = "";
+          try { sessionStorage.removeItem("semester-sathi-gemini-key"); } catch (e) { }
+          render();
+          showToast("Gemini key cleared from this session.");
+        }
+        else if (name === "add-task") openTaskModal(action.dataset.date);
+        else if (name === "add-subject") openSubjectModal();
+        else if (name === "add-topic") openTopicModal(action.dataset.subject);
+        else if (name === "remove-topic") openRemoveTopicModal(action.dataset.subject, Number(action.dataset.topicIndex));
+        else if (name === "confirm-remove-topic") {
+          var removalSubject = subjectById(action.dataset.subject);
+          var removalIndex = Number(action.dataset.topicIndex);
+          if (removalSubject && removalSubject.topics[removalIndex]) {
+            var removedTopicName = removalSubject.topics[removalIndex].name;
+            removalSubject.topics.splice(removalIndex, 1);
+            saveState(); closeModal(); render(); showToast("“" + removedTopicName + "” removed from the subject.");
+          }
+        }
+        else if (name === "toggle-theme") {
+          state.theme = state.theme === "dark" ? "light" : "dark";
+          saveState(); render();
+          showToast((state.theme === "dark" ? "Dark" : "Light") + " mode enabled.");
+        }
+        else if (name === "month-prev" || name === "month-next") {
+          var parts = state.viewMonth.split("-").map(Number);
+          var changed = new Date(parts[0], parts[1] - 1 + (name === "month-next" ? 1 : -1), 1, 12);
+          state.viewMonth = localISO(changed).slice(0, 7);
+          state.selectedDate = localISO(changed);
+          saveState(); render();
+        }
+        else if (name === "close-modal") closeModal();
+        else if (name === "backdrop" && event.target === action) closeModal();
+        else if (name === "export") exportBackup();
+        else if (name === "import") document.getElementById("import-file").click();
+        else if (name === "reset") resetDemo();
+      });
+      document.addEventListener("submit", function (event) {
+        if (event.target.id === "chat-form") { event.preventDefault(); sendGeminiChat(); }
+      });
+      document.addEventListener("change", function (event) {
+        var check = event.target.closest("[data-task-check]");
+        if (check) {
+          var task = state.tasks.find(function (item) { return item.id === check.dataset.taskCheck; });
+          if (task) {
+            task.completed = check.checked;
+            if (check.checked) cancelNativeReminder(task.id); else scheduleNativeReminder(task);
+            saveState(); render();
+          }
+          return;
+        }
+        if (event.target.id === "import-file") importBackup(event.target.files && event.target.files[0]);
+      });
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && event.target.id === "chat-input" && !event.shiftKey) {
+          event.preventDefault();
+          var chatForm = document.getElementById("chat-form");
+          if (chatForm && chatForm.requestSubmit) chatForm.requestSubmit();
+        }
+        if (event.key === "Escape") closeModal();
+      });
+      render();
+      saveState();
+    })();
+  </script>
+</body>
+</html>
