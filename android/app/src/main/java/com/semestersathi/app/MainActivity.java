@@ -2,9 +2,11 @@ package com.semestersathi.app;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.security.keystore.KeyGenParameterSpec;
@@ -13,6 +15,7 @@ import android.util.Base64;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
+import android.webkit.ValueCallback;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -40,6 +43,7 @@ import javax.crypto.spec.GCMParameterSpec;
 
 public class MainActivity extends Activity {
     private static final int POST_NOTIFICATIONS_REQUEST = 801;
+    private static final int FILE_CHOOSER_REQUEST = 802;
     private static final String LEGACY_FILE_URL = "file:///android_asset/index.html";
     private static final String APP_BASE_URL = "https://appassets.androidplatform.net/";
     private static final String MIGRATION_PREFS = "semester_sathi_webview_migration";
@@ -54,6 +58,7 @@ public class MainActivity extends Activity {
     private volatile String pendingMigrationApiKey = "";
     private SharedPreferences migrationPrefs;
     private WebView webView;
+    private ValueCallback<Uri[]> fileChooserCallback;
 
     @Override
     @SuppressWarnings("deprecation")
@@ -104,7 +109,23 @@ public class MainActivity extends Activity {
                 return !isAppUrl(url);
             }
         });
-        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback,
+                                             FileChooserParams fileChooserParams) {
+                if (fileChooserCallback != null) fileChooserCallback.onReceiveValue(null);
+                fileChooserCallback = callback;
+                try {
+                    startActivityForResult(fileChooserParams.createIntent(), FILE_CHOOSER_REQUEST);
+                    return true;
+                } catch (ActivityNotFoundException exception) {
+                    fileChooserCallback = null;
+                    callback.onReceiveValue(null);
+                    Toast.makeText(MainActivity.this, "No document picker is available on this device.", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            }
+        });
         webView.addJavascriptInterface(new StudyBridge(), "Android");
         setContentView(webView);
 
@@ -303,6 +324,19 @@ public class MainActivity extends Activity {
         } catch (ParseException exception) {
             Toast.makeText(this, "Could not read the reminder date and time.", Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
+        if (requestCode == FILE_CHOOSER_REQUEST) {
+            if (fileChooserCallback != null) {
+                Uri[] results = WebChromeClient.FileChooserParams.parseResult(resultCode, data);
+                fileChooserCallback.onReceiveValue(results);
+                fileChooserCallback = null;
+            }
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
