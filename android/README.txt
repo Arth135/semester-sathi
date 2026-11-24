@@ -7,6 +7,8 @@ Features
 - Add and remove chapters or lessons manually.
 - Light and dark themes.
 - Optional Gemini chat and study-plan generation using the key supplied by the student. AI chat can propose adding or removing subjects and tasks, adding chapters / lessons, and changing topic statuses. Review and approve proposals before app data changes. A subject needs only a name; exam details and topics can be added or edited later.
+- Local Files library for PDFs, Office/OpenDocument files, text, images, and EPUB e-books. Attach supported study documents in AI Chat to ask Gemini about exam dates or build a study plan.
+- Phone navigation opens from the Sections button or Semester Sathi title; profile icon contains Student profile and Data & settings.
 - Test connection in Data & settings reports key, quota, or request errors. Temporary network/server failures are retried once.
 - Local task reminders, restored after a phone restart. Android 13+ asks for notification permission.
 - HTTPS-style local WebView origin for reliable cross-origin Gemini requests. No app screen is hosted remotely.
@@ -22,6 +24,6 @@ Install
 Copy the debug APK to an Android phone and open it. Allow installation from the file manager if Android asks. Android creates a local debug signing key on the first build. This debug APK is for personal testing, not public release.
 
 Gemini and privacy
-The API key belongs to each user and is not embedded in the APK or exported in backups. It is encrypted with Android Keystore on the phone and persists until cleared in Settings. Gemini sends the prompt and relevant study data to Google only when an AI feature is used. The app itself has no account or sync server. Google quota and free-tier policies are controlled by Google.
+The API key belongs to each user and is not embedded in the APK or exported in backups. It is encrypted with Android Keystore on the phone and persists until cleared in Data & settings. Gemini sends the prompt and relevant study data to Google only when an AI feature is used. Attached documents are copied to on-device storage and sent directly to Google only when the student sends the chat. Large Google Files API uploads are temporarily retained by Google for up to 48 hours. The app itself has no account or sync server. Google quota and free-tier policies are controlled by Google.
 
 Reminders use Android's inexact alarms, so the operating system may delay a notification while the device is idle or saving battery.
