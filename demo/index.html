@@ -51,7 +51,8 @@
       --shadow: 0 12px 32px rgba(0, 0, 0, .24);
     }
     * { box-sizing: border-box; }
-    body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--bg); font-size: 16px; }
+    html { overflow-x: clip; scrollbar-gutter: stable; }
+    body { margin: 0; min-width: 320px; min-height: 100vh; overflow-x: clip; background: var(--bg); font-size: 16px; }
     button, input, select, textarea { font: inherit; }
     button { color: inherit; }
     button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
@@ -99,7 +100,7 @@
     .top-caption { color: var(--muted); font-size: 13px; }
     .topbar-actions { display: flex; align-items: center; gap: 10px; }
     .avatar { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 50%; background: #dcece3; color: var(--green-dark); font-size: 13px; font-weight: 700; }
-    .main-content { width: min(100%, 1440px); margin: 0 auto; padding: 30px clamp(22px, 4vw, 54px) 42px; }
+    .main-content { width: min(100%, 1440px); min-width: 0; margin: 0 auto; padding: 30px clamp(22px, 4vw, 54px) 42px; }
     .page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-bottom: 24px; }
     .eyebrow { margin: 0 0 7px; color: var(--green); font-size: 12px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; }
     h1 { margin: 0; font-size: clamp(26px, 3vw, 34px); line-height: 1.15; letter-spacing: -.045em; }
@@ -196,6 +197,7 @@
     .progress-fill { height: 100%; border-radius: inherit; background: var(--green); }
     .subject-card { padding: 17px; }
     .subject-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+    .subject-card-tools { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 7px; }
     .subject-name-line { display: flex; align-items: center; gap: 10px; }
     .subject-color { width: 10px; height: 10px; flex: 0 0 auto; border-radius: 50%; background: var(--subject-color, var(--green)); }
     .subject-name { font-size: 16px; font-weight: 750; }
@@ -207,6 +209,7 @@
     .topic-actions { display: flex; align-items: center; gap: 7px; flex: 0 0 auto; }
     .topic-remove-button { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--muted); font-size: 16px; line-height: 1; cursor: pointer; }
     .topic-remove-button:hover { border-color: var(--red); color: var(--red); background: var(--red-soft); }
+    .task-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
     .topic-add-button { width: 100%; margin-top: 10px; }
     .topic-status-button { border: 0; cursor: pointer; }
     .topic-hint { margin-top: 13px; color: var(--muted); font-size: 13px; }
@@ -228,13 +231,13 @@
     .settings-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
     .demo-note { display: flex; align-items: flex-start; gap: 11px; margin-top: 18px; padding: 14px 16px; border-radius: 14px; background: #f0f5f1; color: #53645a; font-size: 13px; line-height: 1.5; }
     .demo-note strong { color: #2c5340; }
-    .chat-shell { display: grid; grid-template-rows: minmax(0,1fr) auto; width: 100%; min-width: 0; height: min(68vh,720px); height: min(68dvh,720px); min-height: 360px; max-height: calc(100dvh - 220px); overflow: hidden; padding: 0; }
-    .chat-feed { display: flex; flex-direction: column; gap: 14px; min-width: 0; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; overflow-anchor: none; padding: 22px; }
+    .chat-shell { display: grid; grid-template-rows: minmax(0,1fr) auto; width: 100%; min-width: 0; max-width: 100%; height: min(68vh,720px); height: min(68dvh,720px); min-height: 360px; max-height: calc(100dvh - 220px); overflow: hidden; padding: 0; }
+    .chat-feed { display: flex; flex-direction: column; align-items: stretch; gap: 14px; width: 100%; min-width: 0; min-height: 0; max-width: 100%; overflow-x: clip; overflow-y: auto; scrollbar-gutter: stable; overscroll-behavior: contain; overflow-anchor: none; padding: 22px; }
     .chat-empty { display: grid; flex: 1; place-content: center; text-align: center; padding: 28px; }
     .chat-empty-mark { display: grid; width: 46px; height: 46px; place-items: center; margin: 0 auto 12px; border-radius: 15px; background: var(--green-soft); color: var(--green-dark); font-size: 22px; }
     .chat-empty h2 { margin: 0; font-size: 18px; }
     .chat-empty p { max-width: 440px; margin: 7px auto 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
-    .chat-message { box-sizing: border-box; max-width: min(84%,720px); min-width: 0; padding: 13px 15px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface-soft); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55; }
+    .chat-message { box-sizing: border-box; width: fit-content; max-width: min(84%,720px); min-width: 0; padding: 13px 15px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface-soft); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55; }
     .chat-message.user { align-self: flex-end; border-color: transparent; border-bottom-right-radius: 5px; background: var(--green); color: white; }
     .chat-message.assistant { align-self: flex-start; border-bottom-left-radius: 5px; }
     .chat-message-label { margin-bottom: 5px; color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .06em; text-transform: uppercase; }
@@ -244,10 +247,10 @@
     .chat-pending-title { margin: 0 0 8px; font-size: 13px; font-weight: 750; }
     .chat-proposal-list { display: grid; gap: 6px; margin: 0 0 10px; padding-left: 18px; color: var(--muted); font-size: 13px; }
     .chat-pending-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-    .chat-compose { padding: 16px 20px; border-top: 1px solid var(--line); background: var(--surface); }
+    .chat-compose { width: 100%; min-width: 0; max-width: 100%; padding: 16px 20px; border-top: 1px solid var(--line); background: var(--surface); }
     .chat-compose-row { display: flex; align-items: flex-end; gap: 10px; }
     .chat-compose-row textarea { box-sizing: border-box; flex: 1; min-width: 0; min-height: 50px; max-height: 150px; resize: vertical; padding: 12px 13px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface-soft); color: var(--ink); font: inherit; line-height: 1.45; }
-    .chat-compose-row .button { min-height: 48px; }
+    .chat-compose-row .button { width: 88px; min-width: 88px; min-height: 48px; flex: 0 0 88px; }
     .chat-compose-note { display: flex; justify-content: space-between; gap: 10px; margin-top: 9px; color: var(--muted); font-size: 11px; line-height: 1.4; }
     .chat-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
     .chat-api-status { color: var(--muted); font-size: 12px; }
@@ -651,10 +654,10 @@
       }
       function taskMarkup(task) {
         var color = subjectColor(task.subjectId);
-        return '<label class="task-row' + (task.completed ? ' is-complete' : '') + '">' +
+        return '<div class="task-row' + (task.completed ? ' is-complete' : '') + '">' +
           '<input class="task-check" type="checkbox" data-task-check="' + esc(task.id) + '"' + (task.completed ? ' checked' : '') + ' aria-label="Mark ' + esc(task.title) + ' complete">' +
-          '<span class="task-main"><span class="task-title">' + esc(task.title) + '</span><span class="task-meta"><span class="subject-tag" style="--tag:' + esc(color) + '"><i aria-hidden="true"></i>' + esc(subjectName(task.subjectId)) + '</span><span>·</span><span>' + esc(task.type || "Study") + '</span><span>·</span><span>' + esc(task.duration) + ' min</span></span></span>' +
-          '<span class="task-time">' + esc(task.time) + '</span></label>';
+          '<div class="task-main"><div class="task-title">' + esc(task.title) + '</div><div class="task-meta"><span class="subject-tag" style="--tag:' + esc(color) + '"><i aria-hidden="true"></i>' + esc(subjectName(task.subjectId)) + '</span><span>·</span><span>' + esc(task.type || "Study") + '</span><span>·</span><span>' + esc(task.duration) + ' min</span></div></div>' +
+          '<div class="task-actions"><span class="task-time">' + esc(task.time) + '</span><button class="topic-remove-button" type="button" data-action="remove-task" data-task="' + esc(task.id) + '" aria-label="Remove task ' + esc(task.title) + '">×</button></div></div>';
       }
       function findAvailableTime(date, preferredHour, duration) {
         for (var hour = Math.max(8, preferredHour); hour <= 20; hour++) {
@@ -726,8 +729,9 @@
           var cls = topic.status === "done" ? "" : topic.status === "in-progress" ? " in-progress" : " not-started";
           return '<div class="topic-row"><span class="topic-name">' + esc(topic.name) + '</span><div class="topic-actions"><button class="status-chip topic-status-button' + cls + '" type="button" data-topic="' + esc(subject.id) + ':' + index + '" aria-label="Change status for ' + esc(topic.name) + '">' + label + '</button><button class="topic-remove-button" type="button" data-action="remove-topic" data-subject="' + esc(subject.id) + '" data-topic-index="' + index + '" aria-label="Remove ' + esc(topic.name) + ' from ' + esc(subject.name) + '">×</button></div></div>';
         }).join("");
-        return '<article class="subject-card" data-subject-card="' + esc(subject.id) + '"><div class="subject-card-head"><div><div class="subject-name-line"><i class="subject-color" style="--subject-color:' + esc(subject.color) + '"></i><span class="subject-name">' + esc(subject.name) + '</span></div><div class="subject-code">' + esc(subject.code || "Subject") + '</div></div><span class="status-chip">' + done + ' / ' + subject.topics.length + ' topics done</span></div>' +
-          '<p class="subject-exam">Exam: <strong>' + esc(dateLabel(subject.examDate)) + '</strong> · ' + esc(subject.examTime || "Time TBA") + ' · ' + esc(subject.room || "Room TBA") + '</p>' +
+        var examDetails = subject.examDate ? '<p class="subject-exam">Exam: <strong>' + esc(dateLabel(subject.examDate)) + '</strong> · ' + esc(subject.examTime || "Time TBA") + ' · ' + esc(subject.room || "Room TBA") + '</p>' : '<p class="subject-exam">No exam date added yet.</p>';
+        return '<article class="subject-card" data-subject-card="' + esc(subject.id) + '"><div class="subject-card-head"><div><div class="subject-name-line"><i class="subject-color" style="--subject-color:' + esc(subject.color) + '"></i><span class="subject-name">' + esc(subject.name) + '</span></div><div class="subject-code">' + esc(subject.code || "Subject") + '</div></div><div class="subject-card-tools"><span class="status-chip">' + done + ' / ' + subject.topics.length + ' topics done</span><button class="button button-small" type="button" data-action="edit-subject" data-subject="' + esc(subject.id) + '">Edit</button><button class="topic-remove-button" type="button" data-action="remove-subject" data-subject="' + esc(subject.id) + '" aria-label="Remove ' + esc(subject.name) + '">×</button></div></div>' +
+          examDetails +
           '<div class="progress-line"><span>Syllabus completion · from topics</span><strong>' + pct + '%</strong></div><div class="progress-track" role="progressbar" aria-label="' + esc(subject.name) + ' syllabus completion" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100"><div class="progress-fill" style="width:' + pct + '%;background:' + esc(subject.color) + '"></div></div>' +
           '<div class="topic-list" style="margin-top:12px">' + (topics || '<div class="empty-state">No chapters or lessons yet. Add some to start tracking this subject.</div>') + '</div><button class="button button-small topic-add-button" type="button" data-action="add-topic" data-subject="' + esc(subject.id) + '">+ Add chapter / lesson</button><p class="topic-hint">' + inProgress + ' topic' + (inProgress === 1 ? '' : 's') + ' in progress · Tap a status to update it.</p></article>';
       }
@@ -765,7 +769,7 @@
       }
       function renderSubjectsPage() {
         var top = pageHeading("Your subjects", "Track topics and exam dates. Subject progress updates automatically as you mark topics done.", '<button class="button button-primary" type="button" data-action="add-subject">Add subject</button>');
-        return top + '<div class="subject-grid">' + state.subjects.map(subjectCardMarkup).join("") + '</div>';
+        return top + (state.subjects.length ? '<div class="subject-grid">' + state.subjects.map(subjectCardMarkup).join("") + '</div>' : '<div class="empty-state">No subjects yet. Add a subject using its name only; exam dates and other details can be filled in later.</div>');
       }
       function renderTasksPage() {
         var filters = '<div class="filter-row">' +
@@ -802,9 +806,9 @@
         var profileSummary = [profile.institutionType, profile.institutionName, profile.course, profile.yearLevel, profile.semester].filter(Boolean).join(" · ") || "Add your course and year details";
         var top = pageHeading("Data & settings", "Your study workspace is local by default. Gemini is an optional online planner.", "");
         var readyClass = apiKey ? " is-ready" : "";
-        var keyCard = '<section class="settings-card"><div class="panel-head"><div><h2>Gemini AI chat & planner</h2><p class="panel-subtitle">Optional · uses Google Gemini 3.5 Flash-Lite</p></div><span id="gemini-status-badge" class="api-status' + readyClass + '"><span class="api-status-dot" aria-hidden="true"></span>' + (apiKey ? "Key saved on this device" : "No key saved") + '</span></div><p>Get a key from <a class="api-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>, then save it here. This model currently has a free tier, with request limits and project eligibility set by Google. After saving, open the AI Chat tab in the main navigation.</p><div class="api-key-row"><div class="field"><label for="gemini-api-key">Your Gemini API key</label><input id="gemini-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your personal API key here" aria-describedby="gemini-key-note"></div><button class="button button-primary" type="button" data-action="save-api-key">Save on this device</button>' + (apiKey ? '<button class="button" type="button" data-action="test-api">Test connection</button><button class="button" type="button" data-action="clear-api-key">Clear</button>' : '') + '</div><p id="gemini-key-note" class="field-help">The key stays on this device between launches. The Android app encrypts it with Android Keystore; the browser demo saves it in this browser. It is not included in your semester backup or synced. Use Clear to remove it.</p><div class="api-disclosure">Chat sends your message plus subjects, exam dates, topic statuses, and upcoming open tasks to Google. The app excludes your name and college. Free-tier prompts may be used by Google to improve its products. Use a project with billing disabled if you want to avoid accidental paid API usage, and check your project’s quota. Gemini needs internet; the offline planner remains available.</div></section>';
+        var keyCard = '<section class="settings-card"><div class="panel-head"><div><h2>Gemini AI chat & planner</h2><p class="panel-subtitle">Optional · uses Google Gemini 3.5 Flash-Lite</p></div><span id="gemini-status-badge" class="api-status' + readyClass + '"><span class="api-status-dot" aria-hidden="true"></span>' + (apiKey ? "Key saved on this device" : "No key saved") + '</span></div><p>Get a key from <a class="api-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>, then save it here. This model currently has a free tier, with request limits and project eligibility set by Google. After saving, open the AI Chat tab in the main navigation.</p><div class="api-key-row"><div class="field"><label for="gemini-api-key">Your Gemini API key</label><input id="gemini-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your personal API key here" aria-describedby="gemini-key-note"></div><button class="button button-primary" type="button" data-action="save-api-key">Save on this device</button>' + (apiKey ? '<button class="button" type="button" data-action="test-api">Test connection</button><button class="button" type="button" data-action="clear-api-key">Clear</button>' : '') + '</div><p id="gemini-key-note" class="field-help">The key stays on this device between launches. The Android app encrypts it with Android Keystore; the browser demo saves it in this browser. It is not included in your semester backup or synced. Use Clear to remove it.</p><div class="api-disclosure">Chat sends your message plus your subjects, exam dates, topic statuses, and task details to Google so it can answer and suggest changes. The app excludes your name and college. Free-tier prompts may be used by Google to improve its products. Use a project with billing disabled if you want to avoid accidental paid API usage, and check your project’s quota. Gemini needs internet; the offline planner remains available.</div></section>';
         var appearanceCard = '<section class="settings-card"><h2>Appearance</h2><p>Choose the theme that is easier to read. Your choice is saved on this device.</p><div class="settings-actions"><button class="button button-primary" type="button" data-action="toggle-theme">Switch to ' + (state.theme === "dark" ? "light" : "dark") + ' mode</button><span class="field-help" style="align-self:center">Current: ' + (state.theme === "dark" ? "Dark" : "Light") + '</span></div></section>';
-        return top + '<div class="settings-grid"><section class="settings-card"><h2>Student profile</h2><p>' + esc(profile.displayName ? profile.displayName + " · " : "") + esc(profileSummary) + '</p><div class="settings-actions"><button class="button" type="button" data-action="edit-profile">Edit profile</button></div></section>' + appearanceCard + keyCard + '<section class="settings-card"><h2>Local demo data</h2><p>Your profile, subjects, tasks, and progress are saved in this browser. They are not synced to another device. Export a JSON backup if you want to move your semester data.</p><div class="settings-actions"><button class="button button-primary" type="button" data-action="export">Export backup</button><button class="button" type="button" data-action="import">Import backup</button><input id="import-file" type="file" accept="application/json,.json" class="hidden"></div></section><section class="settings-card"><h2>Reset sample workspace</h2><p>Restore the sample subjects, exam dates, and tasks while keeping your student profile.</p><div class="settings-actions"><button class="button" type="button" data-action="reset">Restore sample data</button></div></section></div><div class="demo-note"><strong>Privacy</strong><span>AI Chat sends your message and study context only when you send it; the study planner sends selected subject details after you accept its notice. Your name and college details are excluded. Gemini requests need internet. All other study data stays on this device by default.</span></div>';
+          return top + '<div class="settings-grid"><section class="settings-card"><h2>Student profile</h2><p>' + esc(profile.displayName ? profile.displayName + " · " : "") + esc(profileSummary) + '</p><div class="settings-actions"><button class="button" type="button" data-action="edit-profile">Edit profile</button></div></section>' + appearanceCard + keyCard + '<section class="settings-card"><h2>Local demo data</h2><p>Your profile, subjects, tasks, and progress are saved in this browser. They are not synced to another device. Export a JSON backup if you want to move your semester data.</p><div class="settings-actions"><button class="button button-primary" type="button" data-action="export">Export backup</button><button class="button" type="button" data-action="import">Import backup</button><input id="import-file" type="file" accept="application/json,.json" class="hidden"></div></section><section class="settings-card"><h2>Reset sample workspace</h2><p>Restore the sample subjects, exam dates, and tasks while keeping your student profile.</p><div class="settings-actions"><button class="button" type="button" data-action="reset">Restore sample data</button></div></section></div><div class="demo-note"><strong>Privacy</strong><span>AI Chat sends your message and study context only when you send it; the study planner sends selected subject details after you accept its notice. Your name and college details are excluded. Gemini requests need internet. All other study data stays on this device by default.</span></div>';
       }
       function chatStudyContext() {
         return {
@@ -813,15 +817,20 @@
           subjects: state.subjects.map(function (subject) {
             return { name: subject.name, exam_date: subject.examDate, exam_time: subject.examTime || "", topics: subject.topics.map(function (topic) { return { name: topic.name, status: topic.status }; }) };
           }),
-          upcoming_open_tasks: state.tasks.filter(function (task) { return !task.completed && task.date >= state.today; }).sort(function (a, b) { return a.date.localeCompare(b.date) || a.time.localeCompare(b.time); }).slice(0, 20).map(function (task) {
-            return { title: task.title, subject: subjectName(task.subjectId), date: task.date, time: task.time, duration_minutes: task.duration };
+          tasks: state.tasks.slice().sort(function (a, b) { return a.date.localeCompare(b.date) || a.time.localeCompare(b.time); }).slice(-100).map(function (task) {
+            return { task_id: task.id, title: task.title, subject: subjectName(task.subjectId), date: task.date, time: task.time, duration_minutes: task.duration, completed: !!task.completed };
           })
         };
       }
       function chatActionDescription(action) {
         var subjectLabel = action.subject || "General";
-        if (action.type === "add_subject") return "Add subject “" + action.name + "” with exam on " + action.examDate + (action.topics.length ? " and " + action.topics.length + " chapters / lessons" : "");
+        if (action.type === "add_subject") return "Add subject “" + action.name + "”" + (action.examDate ? " with exam on " + dateLabel(action.examDate) : " (no exam date yet)") + (action.topics.length ? " and " + action.topics.length + " chapters / lessons" : "");
+        if (action.type === "remove_subject") {
+          var linkedCount = state.tasks.filter(function (task) { return task.subjectId === action.subjectId; }).length;
+          return "Remove subject “" + action.name + "”" + (linkedCount ? " and " + linkedCount + " linked task" + (linkedCount === 1 ? "" : "s") : "");
+        }
         if (action.type === "add_task") return "Add “" + action.title + "” for " + subjectLabel + " on " + action.date + " at " + action.time + " (" + action.duration_minutes + " min)";
+        if (action.type === "remove_task") return "Remove task “" + action.title + "” for " + subjectLabel + " on " + dateLabel(action.date);
         if (action.type === "set_topic_status") return "Mark “" + action.topic + "” in " + subjectLabel + " as " + action.status;
         if (action.type === "add_topic") return "Add “" + action.topic + "” to " + subjectLabel;
         if (action.type === "remove_topic") return "Remove “" + action.topic + "” from " + subjectLabel;
@@ -858,7 +867,7 @@
       }
       function updateChatBusyUI() {
         var button = document.querySelector("#chat-form button[type='submit']");
-        if (button) { button.disabled = chatLoading; button.textContent = chatLoading ? "Thinking…" : "Send"; }
+        if (button) { button.disabled = chatLoading; button.textContent = chatLoading ? "Thinking…" : "Send"; button.setAttribute("aria-label", chatLoading ? "Gemini is thinking" : "Send message"); }
         var status = document.getElementById("chat-api-status");
         if (status) status.textContent = chatLoading ? "Gemini is replying…" : apiKey ? "Gemini key saved · ready when online" : "Add a Gemini key to start chatting";
       }
@@ -866,7 +875,7 @@
         var top = pageHeading("Chat with your study AI", "Ask for explanations, revision advice, or changes to your study schedule.", '<button class="button button-small" type="button" data-action="clear-chat"' + (state.chatMessages.length ? '' : ' disabled') + '>Clear chat</button>');
         var status = apiKey ? "Gemini key saved · ready when online" : "Add a Gemini key to start chatting";
         var feedContent = chatFeedMarkup();
-        var form = apiKey ? '<form id="chat-form" class="chat-compose"><div class="chat-compose-row"><textarea id="chat-input" name="message" maxlength="1200" placeholder="Ask about your subjects, or request a study task…" aria-label="Message Semester Sathi AI" required></textarea><button class="button button-primary" type="submit"' + (chatLoading ? ' disabled' : '') + '>' + (chatLoading ? 'Thinking…' : 'Send') + '</button></div><div class="chat-compose-note"><span>Your message and study context are sent to Google using your key. Profile and college details are excluded.</span><span id="chat-api-status" class="chat-api-status" role="status">' + (chatLoading ? 'Gemini is replying…' : status) + '</span></div></form>' : '<div class="chat-compose"><div class="chat-toolbar"><span class="field-help">The key you save in Data & settings unlocks Gemini chat here.</span><button class="button button-primary" type="button" data-page="settings">Open Data & settings</button></div></div>';
+        var form = apiKey ? '<form id="chat-form" class="chat-compose"><div class="chat-compose-row"><textarea id="chat-input" name="message" maxlength="1200" placeholder="Ask about your subjects, or request a study task…" aria-label="Message Semester Sathi AI" required></textarea><button class="button button-primary" type="submit" aria-label="' + (chatLoading ? 'Gemini is thinking' : 'Send message') + '"' + (chatLoading ? ' disabled' : '') + '>' + (chatLoading ? 'Thinking…' : 'Send') + '</button></div><div class="chat-compose-note"><span>Your message and study context are sent to Google using your key. Profile and college details are excluded.</span><span id="chat-api-status" class="chat-api-status" role="status">' + (chatLoading ? 'Gemini is replying…' : status) + '</span></div></form>' : '<div class="chat-compose"><div class="chat-toolbar"><span class="field-help">The key you save in Data & settings unlocks Gemini chat here.</span><button class="button button-primary" type="button" data-page="settings">Open Data & settings</button></div></div>';
         return top + '<div class="chat-toolbar"><span class="chat-api-status">' + status + '</span></div><section class="panel chat-shell" aria-label="AI chat"><div id="chat-feed" class="chat-feed" aria-live="polite">' + feedContent + '</div>' + form + '</section>';
       }
       function openOnboarding(editing) {
@@ -1024,7 +1033,7 @@
             var subjectName = String(raw.name || raw.subject || "").trim().slice(0, 50);
             var examDate = String(raw.exam_date || "").trim();
             var duplicate = state.subjects.some(function (item) { return item.name.toLowerCase() === subjectName.toLowerCase(); });
-            if (!subjectName || duplicate || state.subjects.length >= 30 || !/^\d{4}-\d{2}-\d{2}$/.test(examDate) || localISO(parseLocal(examDate)) !== examDate) return;
+            if (!subjectName || duplicate || state.subjects.length >= 30 || (examDate && (!/^\d{4}-\d{2}-\d{2}$/.test(examDate) || localISO(parseLocal(examDate)) !== examDate))) return;
             var examTime = String(raw.exam_time || "").trim();
             if (examTime && (!/^\d{2}:\d{2}$/.test(examTime) || Number(examTime.slice(0, 2)) > 23 || Number(examTime.slice(3)) > 59)) examTime = "";
             var topics = Array.isArray(raw.topics) ? raw.topics.map(function (topic) { return String(topic || "").trim().slice(0, 80); }).filter(Boolean) : [];
@@ -1032,14 +1041,28 @@
             accepted.push({ type: action.type, name: subjectName, code: String(raw.code || "").trim().slice(0, 20), examDate: examDate, examTime: examTime, room: String(raw.room || "").trim().slice(0, 50), topics: topics });
             return;
           }
+          if (action.type === "remove_subject") {
+            var removeName = String(raw.name || raw.subject || "").trim();
+            var removeSubject = state.subjects.find(function (item) { return item.name.toLowerCase() === removeName.toLowerCase(); });
+            if (!removeSubject) return;
+            accepted.push({ type: action.type, name: removeSubject.name, subject: removeSubject.name, subjectId: removeSubject.id });
+            return;
+          }
           if (action.type === "add_task") {
             var title = String(raw.title || "").trim().slice(0, 100);
-            var date = String(raw.date || "").trim();
-            var time = String(raw.time || "").trim();
-            var duration = Number(raw.duration_minutes);
+            var date = String(raw.date || state.today).trim();
+            var time = String(raw.time || "16:00").trim();
+            var duration = Number(raw.duration_minutes || 45);
             if (!title || (subjectLabel && !subject) || !/^\d{4}-\d{2}-\d{2}$/.test(date) || localISO(parseLocal(date)) !== date || date < state.today) return;
             if (!/^\d{2}:\d{2}$/.test(time) || Number(time.slice(0, 2)) > 23 || Number(time.slice(3)) > 59 || !Number.isInteger(duration) || duration < 5 || duration > 240) return;
             accepted.push({ type: action.type, subject: subject ? subject.name : "", subjectId: subject ? subject.id : "", title: title, date: date, time: time, duration_minutes: duration });
+            return;
+          }
+          if (action.type === "remove_task") {
+            var taskId = String(raw.task_id || "").trim();
+            var removeTask = state.tasks.find(function (item) { return item.id === taskId; });
+            if (!removeTask) return;
+            accepted.push({ type: action.type, taskId: removeTask.id, title: removeTask.title, subject: subjectName(removeTask.subjectId), date: removeTask.date });
             return;
           }
           if (!subject) return;
@@ -1063,7 +1086,7 @@
           properties: {
             reply: { type: "string" },
             actions: { type: "array", items: { type: "object", properties: {
-              type: { type: "string" }, subject: { type: "string" }, title: { type: "string" },
+              type: { type: "string" }, subject: { type: "string" }, title: { type: "string" }, task_id: { type: "string" },
               date: { type: "string" }, time: { type: "string" }, duration_minutes: { type: "integer" },
               topic: { type: "string" }, status: { type: "string" }, name: { type: "string" },
               code: { type: "string" }, exam_date: { type: "string" }, exam_time: { type: "string" },
@@ -1155,7 +1178,7 @@
         var recent = state.chatMessages.slice(-12).map(function (message) {
           return (message.role === "user" ? "Student" : "Assistant") + ": " + message.text;
         }).join("\n");
-        var prompt = "You are Semester Sathi, a concise and supportive study assistant. Answer questions naturally and use the supplied study context when relevant. Do not claim that app data changed unless you include a proposed action. You may suggest these app changes: add_subject, add_task, set_topic_status, or add_topic. To add a subject, use type add_subject, name, exam_date (YYYY-MM-DD), optional exam_time (HH:MM), code, room, and a topics array of chapter or lesson names. If the student has not provided an exam date, ask for it instead of proposing a subject. Do not propose a subject already in the context. For other actions, use exact subject and topic names from the context. Dates must use YYYY-MM-DD, times HH:MM (24-hour), and task durations 5 to 240 minutes. Suggest at most 5 actions. For an action that does not match a real subject/topic or valid date, do not include it. Never output code or arbitrary commands. Always return JSON with a helpful reply and an actions array; use an empty actions array when no app change is needed. Current app context (no student name or college details): " + JSON.stringify(chatStudyContext()) + "\n\nRecent conversation:\n" + recent;
+        var prompt = "You are Semester Sathi, a concise and supportive study assistant. Answer questions naturally using the study context. App changes are proposals only; never claim a change is applied unless the student approves it in the app. Supported actions: add_subject, remove_subject, add_task, remove_task, set_topic_status, add_topic. A subject needs only a name. To add one, use add_subject with name; exam_date (YYYY-MM-DD), exam_time (HH:MM), code, room, and topics are optional. If the student gives only a subject name, propose it immediately with no exam date. Never propose a duplicate subject. To remove a subject, use remove_subject and its exact existing name from context. To remove a task, use remove_task and the exact task_id from context that matches the student's request; never guess an ID or choose among ambiguous tasks without asking. To add a task, use add_task with title and an existing subject name when relevant; if the student gives no date/time/duration, use today, 16:00, and 45 minutes. Dates are YYYY-MM-DD, times HH:MM (24-hour), and duration is 5 to 240 minutes. Use exact subject/topic names for topic actions. Suggest at most 5 valid actions. If the requested target is unclear, ask a brief question and return no action for it. Never output code or arbitrary commands. Always return JSON with a helpful reply and an actions array. Current local study context (no student name or college details): " + JSON.stringify(chatStudyContext()) + "\n\nRecent conversation:\n" + recent;
         try {
           var data = await fetchGeminiInteraction(prompt, chatActionSchema());
           var rawText = interactionText(data).trim();
@@ -1176,6 +1199,21 @@
           refreshChatFeed(false);
         }
       }
+      function removeSubjectData(subjectId) {
+        var subject = subjectById(subjectId);
+        if (!subject) return "";
+        state.tasks.filter(function (task) { return task.subjectId === subjectId; }).forEach(function (task) { cancelNativeReminder(task.id); });
+        state.tasks = state.tasks.filter(function (task) { return task.subjectId !== subjectId; });
+        state.subjects = state.subjects.filter(function (item) { return item.id !== subjectId; });
+        return subject.name;
+      }
+      function removeTaskData(taskId) {
+        var index = state.tasks.findIndex(function (task) { return task.id === taskId; });
+        if (index < 0) return false;
+        cancelNativeReminder(taskId);
+        state.tasks.splice(index, 1);
+        return true;
+      }
       function applyChatActions(messageIndex) {
         var message = state.chatMessages[messageIndex];
         if (!message || !message.pending || !Array.isArray(message.actions)) return;
@@ -1184,12 +1222,16 @@
             var alreadyExists = state.subjects.some(function (item) { return item.name.toLowerCase() === action.name.toLowerCase(); });
             if (!alreadyExists && state.subjects.length < 30) {
               var colors = ["#8b6bb0", "#d17658", "#478a93", "#bd9b38"];
-              state.subjects.push({ id: uid(), name: action.name, code: action.code, examDate: action.examDate, examTime: action.examTime, room: action.room, color: colors[state.subjects.length % colors.length], topics: action.topics.map(function (topic) { return { name: topic, status: "not-started" }; }) });
+              state.subjects.push({ id: uid(), name: action.name, code: action.code, examDate: action.examDate || "", examTime: action.examTime, room: action.room, color: colors[state.subjects.length % colors.length], topics: action.topics.map(function (topic) { return { name: topic, status: "not-started" }; }) });
             }
+          } else if (action.type === "remove_subject") {
+            removeSubjectData(action.subjectId);
           } else if (action.type === "add_task") {
             var task = { id: uid(), title: action.title, subjectId: action.subjectId, date: action.date, time: action.time, duration: action.duration_minutes, type: "AI chat study task", completed: false, generated: true, reminderEnabled: true };
             state.tasks.push(task);
             scheduleNativeReminder(task);
+          } else if (action.type === "remove_task") {
+            removeTaskData(action.taskId);
           } else if (action.type === "set_topic_status") {
             var statusSubject = subjectById(action.subjectId);
             var statusTopic = statusSubject && statusSubject.topics.find(function (item) { return item.name === action.topic; });
@@ -1266,7 +1308,9 @@
       }
       function openPlanModal() {
         if (!state.subjects.length) { showToast("Add at least one subject before building a study plan."); state.page = "subjects"; render(); return; }
-        var options = state.subjects.map(function (subject) { return '<option value="' + esc(subject.id) + '">' + esc(subject.name) + ' · exam ' + esc(dateLabel(subject.examDate)) + '</option>'; }).join("");
+        var planningSubjects = state.subjects.filter(function (subject) { return !!subject.examDate; });
+        if (!planningSubjects.length) { showToast("Add an exam date to a subject before building an exam study plan."); state.page = "subjects"; render(); return; }
+        var options = planningSubjects.map(function (subject) { return '<option value="' + esc(subject.id) + '">' + esc(subject.name) + ' · exam ' + esc(dateLabel(subject.examDate)) + '</option>'; }).join("");
         var body = '<form id="plan-form"><div class="form-grid"><div class="field field-full"><label for="plan-subject">Subject</label><select id="plan-subject" name="subjectId" required>' + options + '</select></div>' +
           '<div class="field"><label for="plan-days">Plan length (days)</label><input id="plan-days" name="days" type="number" min="1" max="30" value="7" required></div>' +
           '<div class="field"><label for="plan-hours">Study hours per day</label><input id="plan-hours" name="hours" type="number" min="0.5" max="8" step="0.5" value="2" required></div>' +
@@ -1305,29 +1349,52 @@
         });
         document.getElementById("task-title-input").focus();
       }
-      function openSubjectModal() {
-        var body = '<form id="subject-form"><div class="form-grid"><div class="field field-full"><label for="subject-name-input">Subject name</label><input id="subject-name-input" name="name" type="text" maxlength="50" placeholder="e.g. Biology" required></div>' +
-          '<div class="field"><label for="subject-code-input">Course code (optional)</label><input id="subject-code-input" name="code" type="text" maxlength="20" placeholder="BIO 204"></div>' +
-          '<div class="field"><label for="subject-exam-date">Exam date</label><input id="subject-exam-date" name="examDate" type="date" value="' + esc(dayOffset(14)) + '" required></div>' +
-          '<div class="field"><label for="subject-exam-time">Exam time</label><input id="subject-exam-time" name="examTime" type="time" value="10:00"></div>' +
-          '<div class="field"><label for="subject-room">Room / venue</label><input id="subject-room" name="room" type="text" maxlength="50" placeholder="Exam hall"></div>' +
-          '<div class="field field-full"><label for="subject-topics-input">Chapters / lessons</label><textarea id="subject-topics-input" name="topics" placeholder="One chapter or lesson per line"></textarea><span class="field-help">You can add or remove chapters later from the subject card.</span></div></div>' +
-          '<div class="modal-actions"><button class="button" type="button" data-action="close-modal">Cancel</button><button class="button button-primary" type="submit">Save subject</button></div></form>';
-        modalFrame("Add a subject", "Set its paper date and add syllabus topics.", body, "");
+      function openSubjectModal(subjectId) {
+        var existing = subjectId ? subjectById(subjectId) : null;
+        if (subjectId && !existing) return;
+        var editing = !!existing;
+        var body = '<form id="subject-form"><div class="form-grid"><div class="field field-full"><label for="subject-name-input">Subject name</label><input id="subject-name-input" name="name" type="text" maxlength="50" placeholder="e.g. Biology" value="' + esc(existing ? existing.name : "") + '" required></div>' +
+          '<div class="field"><label for="subject-code-input">Course code (optional)</label><input id="subject-code-input" name="code" type="text" maxlength="20" placeholder="BIO 204" value="' + esc(existing ? existing.code || "" : "") + '"></div>' +
+          '<div class="field"><label for="subject-exam-date">Exam date (optional)</label><input id="subject-exam-date" name="examDate" type="date" value="' + esc(existing ? existing.examDate || "" : "") + '"></div>' +
+          '<div class="field"><label for="subject-exam-time">Exam time (optional)</label><input id="subject-exam-time" name="examTime" type="time" value="' + esc(existing ? existing.examTime || "" : "") + '"></div>' +
+          '<div class="field"><label for="subject-room">Room / venue (optional)</label><input id="subject-room" name="room" type="text" maxlength="50" placeholder="Exam hall" value="' + esc(existing ? existing.room || "" : "") + '"></div>' +
+          (editing ? '<div class="field field-full"><span class="field-help">Chapters and lessons can be managed from the subject card.</span></div>' : '<div class="field field-full"><label for="subject-topics-input">Chapters / lessons (optional)</label><textarea id="subject-topics-input" name="topics" placeholder="One chapter or lesson per line"></textarea><span class="field-help">You can add or remove chapters later from the subject card.</span></div>') + '</div>' +
+          '<div class="modal-actions"><button class="button" type="button" data-action="close-modal">Cancel</button><button class="button button-primary" type="submit">' + (editing ? 'Save changes' : 'Add subject') + '</button></div></form>';
+        modalFrame(editing ? "Edit subject" : "Add a subject", editing ? "Update any details when you are ready." : "A subject name is all you need. Add exam details and topics now or later.", body, "");
         document.getElementById("subject-form").addEventListener("submit", function (event) {
           event.preventDefault();
           var name = document.getElementById("subject-name-input").value.trim();
-          var topics = document.getElementById("subject-topics-input").value.split(/\r?\n/).map(function (topic) { return topic.trim(); }).filter(Boolean).map(function (topic) { return { name: topic, status: "not-started" }; });
-          if (!name) return;
-          var colors = ["#8b6bb0", "#d17658", "#478a93", "#bd9b38"];
-          state.subjects.push({ id: uid(), name: name, code: document.getElementById("subject-code-input").value.trim(), examDate: document.getElementById("subject-exam-date").value, examTime: document.getElementById("subject-exam-time").value, room: document.getElementById("subject-room").value.trim(), color: colors[state.subjects.length % colors.length], topics: topics });
+          var duplicate = state.subjects.some(function (subject) { return subject.id !== (existing && existing.id) && subject.name.toLowerCase() === name.toLowerCase(); });
+          if (!name || duplicate) { if (duplicate) showToast("A subject with that name already exists."); return; }
+          var fields = { name: name, code: document.getElementById("subject-code-input").value.trim(), examDate: document.getElementById("subject-exam-date").value, examTime: document.getElementById("subject-exam-time").value, room: document.getElementById("subject-room").value.trim() };
+          if (editing) Object.assign(existing, fields);
+          else {
+            var topics = document.getElementById("subject-topics-input").value.split(/\r?\n/).map(function (topic) { return topic.trim(); }).filter(Boolean).map(function (topic) { return { name: topic, status: "not-started" }; });
+            var colors = ["#8b6bb0", "#d17658", "#478a93", "#bd9b38"];
+            state.subjects.push(Object.assign({ id: uid(), color: colors[state.subjects.length % colors.length], topics: topics }, fields));
+          }
           state.page = "subjects";
           saveState();
           closeModal();
           render();
-          showToast(name + " added to your semester.");
+          showToast(editing ? name + " updated." : name + " added to your semester.");
         });
         document.getElementById("subject-name-input").focus();
+      }
+      function openRemoveSubjectModal(subjectId) {
+        var subject = subjectById(subjectId);
+        if (!subject) return;
+        var linkedTasks = state.tasks.filter(function (task) { return task.subjectId === subject.id; });
+        var body = '<p class="field-help">Remove “' + esc(subject.name) + '” from your subjects?' + (linkedTasks.length ? ' This will also remove ' + linkedTasks.length + ' linked task' + (linkedTasks.length === 1 ? '' : 's') + ' and cancel their reminders.' : '') + ' This cannot be undone.</p>';
+        var actions = '<div class="modal-actions"><button class="button" type="button" data-action="close-modal">Keep subject</button><button class="button" type="button" data-action="confirm-remove-subject" data-subject="' + esc(subject.id) + '" style="border-color:var(--red);color:var(--red)">Remove subject</button></div>';
+        modalFrame("Remove this subject?", "This deletes the subject from this device.", body, actions);
+      }
+      function openRemoveTaskModal(taskId) {
+        var task = state.tasks.find(function (item) { return item.id === taskId; });
+        if (!task) return;
+        var body = '<p class="field-help">Remove “' + esc(task.title) + '” from your study plan? Its reminder will be cancelled.</p>';
+        var actions = '<div class="modal-actions"><button class="button" type="button" data-action="close-modal">Keep task</button><button class="button" type="button" data-action="confirm-remove-task" data-task="' + esc(task.id) + '" style="border-color:var(--red);color:var(--red)">Remove task</button></div>';
+        modalFrame("Remove this task?", "The task will be deleted from your calendar and to-do list.", body, actions);
       }
       function openTopicModal(subjectId) {
         var subject = subjectById(subjectId);
@@ -1450,6 +1517,17 @@
         }
         else if (name === "add-task") openTaskModal(action.dataset.date);
         else if (name === "add-subject") openSubjectModal();
+        else if (name === "edit-subject") openSubjectModal(action.dataset.subject);
+        else if (name === "remove-subject") openRemoveSubjectModal(action.dataset.subject);
+        else if (name === "remove-task") openRemoveTaskModal(action.dataset.task);
+        else if (name === "confirm-remove-subject") {
+          var removedSubjectName = removeSubjectData(action.dataset.subject);
+          if (removedSubjectName) { saveState(); closeModal(); render(); showToast("“" + removedSubjectName + "” removed from your semester."); }
+        }
+        else if (name === "confirm-remove-task") {
+          var removedTask = state.tasks.find(function (task) { return task.id === action.dataset.task; });
+          if (removedTask && removeTaskData(removedTask.id)) { saveState(); closeModal(); render(); showToast("Task removed from your study plan."); }
+        }
         else if (name === "add-topic") openTopicModal(action.dataset.subject);
         else if (name === "remove-topic") openRemoveTopicModal(action.dataset.subject, Number(action.dataset.topicIndex));
         else if (name === "confirm-remove-topic") {

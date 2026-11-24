@@ -6,11 +6,11 @@ Features
 - First-time student setup, calendar, exam dates, study to-dos, subjects, and topic-based progress.
 - Add and remove chapters or lessons manually.
 - Light and dark themes.
-- Optional Gemini chat and study-plan generation using the key supplied by the student. AI chat can propose new subjects, tasks, chapters / lessons, and topic-status changes. Review and approve proposals before app data changes. Subject proposals need an exam date and can include chapter names.
+- Optional Gemini chat and study-plan generation using the key supplied by the student. AI chat can propose adding or removing subjects and tasks, adding chapters / lessons, and changing topic statuses. Review and approve proposals before app data changes. A subject needs only a name; exam details and topics can be added or edited later.
 - Test connection in Data & settings reports key, quota, or request errors. Temporary network/server failures are retried once.
 - Local task reminders, restored after a phone restart. Android 13+ asks for notification permission.
 - HTTPS-style local WebView origin for reliable cross-origin Gemini requests. No app screen is hosted remotely.
-- On first launch after upgrading from 0.1.0 through 0.1.2, existing semester data and any still-available session API key are migrated. The Android app encrypts the key for reuse between launches.
+- On first launch after upgrading from 0.1.0 through 0.1.3, existing semester data and any still-available session API key are migrated. The Android app encrypts the key for reuse between launches.
 
 Build
 1. Install JDK 17 or newer.
