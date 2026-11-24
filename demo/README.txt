@@ -6,6 +6,17 @@ Open the demo
 3. Choose the sample semester to explore the app, or start with an empty workspace.
 4. Use Calendar, Subjects, To-dos, AI Chat, and Progress. Your semester information is saved in this browser.
 
+Files and Gemini
+- Open Files from the app sections menu to save exam timetables, e-books, PDFs, Office/OpenDocument files, plain text, and common images on this device.
+- In AI Chat, choose Attach files or Browse saved files. Attached copies are kept in Files; the selected document is sent to Google only when you send the chat message.
+- Gemini can read PDFs, Office/OpenDocument documents, text files, and common images. EPUB e-books are kept locally but need to be converted to PDF before Gemini can read them.
+- Up to 50 MB of files can be attached to one message. Google temporarily stores large Files API uploads and deletes them after 48 hours.
+- Reattach a saved document when asking follow-up questions in a new chat message. File contents are not included in the app's JSON backup.
+
+Profile and navigation
+- Tap the profile icon to open Student profile or Data & settings.
+- On a phone, tap Semester Sathi in the top corner or the Sections button at the bottom to open the app tabs.
+
 Subjects and progress
 - Add or remove chapters / lessons from any subject card.
 - Mark each topic as not started, in progress, or done. Subject and semester progress bars are calculated from the topics marked done; there is no manual percentage slider.
