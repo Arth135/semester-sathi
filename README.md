@@ -4,10 +4,11 @@ Semester Sathi is an offline-first semester planner for Android and modern deskt
 
 ## Download and try it
 
-- Android APK (version 0.1.5): [downloads/Semester-Sathi-0.1.5-debug.apk](downloads/Semester-Sathi-0.1.5-debug.apk)
+- Android APK (version 0.1.6): [downloads/Semester-Sathi-0.1.6-debug.apk](downloads/Semester-Sathi-0.1.6-debug.apk)
 - All versioned APK releases: [GitHub Releases](https://github.com/Arth135/semester-sathi/releases)
 - Android source project: [downloads/semester-sathi-android-source.zip](downloads/semester-sathi-android-source.zip)
 - Browser demo: open [demo/index.html](demo/index.html), or download [downloads/semester-sathi-demo.zip](downloads/semester-sathi-demo.zip)
+- Full project archive: [downloads/semester-sathi-project-0.1.6.zip](downloads/semester-sathi-project-0.1.6.zip)
 
 The APK is a debug build for personal testing. Copy it to your phone, open it, and allow installation from that file manager if Android asks. Allow notifications if you want task reminders. If updating from an earlier version, the first launch migrates existing semester data and any API key still available in the prior app session. A key saved in the app is stored securely for later launches.
 
@@ -20,6 +21,8 @@ The APK is a debug build for personal testing. Copy it to your phone, open it, a
 - Study tasks, offline study-plan generator, and local JSON backup and restore.
 - Optional Gemini AI Chat and AI study-plan generation.
 - A local Files library for exam timetables, e-books, PDFs, Office/OpenDocument files, text, and images. Attach compatible files in AI Chat so Gemini can read dates and help draft a plan.
+- A focused AI Chat screen with suggested study prompts, compact file controls, and setup guidance only when no Gemini key is saved.
+- Mobile section navigation from the header menu; profile and Data & settings remain in the profile menu.
 - Gemini connection check with Google key, quota, and request error details; temporary network/server errors are retried once.
 - Light and dark themes.
 - Android local reminders scheduled on-device and restored after a phone restart.

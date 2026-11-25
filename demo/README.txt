@@ -15,7 +15,8 @@ Files and Gemini
 
 Profile and navigation
 - Tap the profile icon to open Student profile or Data & settings.
-- On a phone, tap Semester Sathi in the top corner or the Sections button at the bottom to open the app tabs.
+- On a phone, tap the Sections button in the header to open the app tabs. Use the profile icon for your student profile and Data & settings.
+- AI Chat has suggested prompts when your Gemini key is saved. API setup details appear there only when no key is saved.
 
 Subjects and progress
 - Add or remove chapters / lessons from any subject card.

@@ -8,7 +8,8 @@ Features
 - Light and dark themes.
 - Optional Gemini chat and study-plan generation using the key supplied by the student. AI chat can propose adding or removing subjects and tasks, adding chapters / lessons, and changing topic statuses. Review and approve proposals before app data changes. A subject needs only a name; exam details and topics can be added or edited later.
 - Local Files library for PDFs, Office/OpenDocument files, text, images, and EPUB e-books. Attach supported study documents in AI Chat to ask Gemini about exam dates or build a study plan.
-- Phone navigation opens from the Sections button or Semester Sathi title; profile icon contains Student profile and Data & settings.
+- Phone navigation opens from the header Sections button; profile icon contains Student profile and Data & settings.
+- AI Chat uses a focused conversation layout with study prompts and compact document controls. API setup guidance appears in chat only when no key is saved.
 - Test connection in Data & settings reports key, quota, or request errors. Temporary network/server failures are retried once.
 - Local task reminders, restored after a phone restart. Android 13+ asks for notification permission.
 - HTTPS-style local WebView origin for reliable cross-origin Gemini requests. No app screen is hosted remotely.

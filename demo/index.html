@@ -96,7 +96,8 @@
       border-bottom: 1px solid var(--line);
     }
     .topbar-left { display: flex; align-items: center; gap: 12px; }
-    .mobile-brand { display: none; border: 0; background: transparent; color: inherit; cursor: pointer; }
+    .mobile-brand { display: none; align-items: center; gap: 8px; color: inherit; font-size: 14px; font-weight: 750; }
+    .sections-toggle { display: none; }
     .top-caption { color: var(--muted); font-size: 13px; }
     .topbar-actions { display: flex; align-items: center; gap: 10px; }
     .avatar { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 50%; background: #dcece3; color: var(--green-dark); font-size: 13px; font-weight: 700; }
@@ -241,12 +242,18 @@
     .settings-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
     .demo-note { display: flex; align-items: flex-start; gap: 11px; margin-top: 18px; padding: 14px 16px; border-radius: 14px; background: #f0f5f1; color: #53645a; font-size: 13px; line-height: 1.5; }
     .demo-note strong { color: #2c5340; }
-    .chat-shell { display: grid; grid-template-rows: minmax(0,1fr) auto; width: 100%; min-width: 0; max-width: 100%; height: min(68vh,720px); height: min(68dvh,720px); min-height: 360px; max-height: calc(100dvh - 220px); overflow: hidden; padding: 0; }
-    .chat-feed { display: flex; flex-direction: column; align-items: stretch; gap: 14px; width: 100%; min-width: 0; min-height: 0; max-width: 100%; overflow-x: clip; overflow-y: auto; scrollbar-gutter: stable; overscroll-behavior: contain; overflow-anchor: none; padding: 22px; }
-    .chat-empty { display: grid; flex: 1; place-content: center; text-align: center; padding: 28px; }
-    .chat-empty-mark { display: grid; width: 46px; height: 46px; place-items: center; margin: 0 auto 12px; border-radius: 15px; background: var(--green-soft); color: var(--green-dark); font-size: 22px; }
-    .chat-empty h2 { margin: 0; font-size: 18px; }
-    .chat-empty p { max-width: 440px; margin: 7px auto 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .chat-shell { display: grid; grid-template-rows: minmax(0,1fr) auto; width: 100%; min-width: 0; max-width: 100%; height: min(72vh,760px); height: min(72dvh,760px); min-height: 430px; max-height: calc(100dvh - 220px); overflow: hidden; padding: 0; border-radius: 22px; }
+    .chat-feed { display: flex; flex-direction: column; align-items: stretch; gap: 18px; width: 100%; min-width: 0; min-height: 0; max-width: 100%; overflow-x: clip; overflow-y: auto; scrollbar-gutter: stable; overscroll-behavior: contain; overflow-anchor: none; padding: 28px clamp(18px,5vw,56px); }
+    .chat-empty { display: grid; align-content: center; justify-items: center; flex: 1; width: min(100%,680px); margin: 0 auto; padding: 28px 16px; text-align: center; }
+    .chat-empty-mark { display: grid; width: 54px; height: 54px; place-items: center; margin: 0 auto 16px; border: 1px solid var(--line); border-radius: 18px; background: var(--green-soft); color: var(--green-dark); font-size: 24px; box-shadow: 0 10px 30px rgba(43,95,66,.1); }
+    .chat-empty h2 { margin: 0; font-size: clamp(22px,3vw,28px); letter-spacing: -.035em; }
+    .chat-empty p { max-width: 480px; margin: 9px auto 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .chat-suggestions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; width: min(100%,620px); margin: 24px auto 0; }
+    .chat-suggestion { min-height: 60px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); color: var(--ink); text-align: left; font: inherit; font-size: 13px; line-height: 1.4; cursor: pointer; transition: border-color .15s ease, transform .15s ease, background .15s ease; }
+    .chat-suggestion:hover { transform: translateY(-1px); border-color: #9dc4ab; background: var(--surface-soft); }
+    .chat-connect-card { width: min(100%,440px); margin: auto; padding: 22px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: var(--shadow); text-align: left; }
+    .chat-connect-card .chat-empty-mark { margin: 0 0 14px; }
+    .chat-connect-card .button { margin-top: 17px; }
     .chat-message { box-sizing: border-box; width: fit-content; max-width: min(84%,720px); min-width: 0; padding: 13px 15px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface-soft); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55; }
     .chat-message.user { align-self: flex-end; border-color: transparent; border-bottom-right-radius: 5px; background: var(--green); color: white; }
     .chat-message.assistant { align-self: flex-start; border-bottom-left-radius: 5px; }
@@ -257,12 +264,16 @@
     .chat-pending-title { margin: 0 0 8px; font-size: 13px; font-weight: 750; }
     .chat-proposal-list { display: grid; gap: 6px; margin: 0 0 10px; padding-left: 18px; color: var(--muted); font-size: 13px; }
     .chat-pending-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-    .chat-compose { width: 100%; min-width: 0; max-width: 100%; padding: 16px 20px; border-top: 1px solid var(--line); background: var(--surface); }
-    .chat-compose-row { display: flex; align-items: flex-end; gap: 10px; }
-    .chat-compose-row textarea { box-sizing: border-box; flex: 1; min-width: 0; min-height: 50px; max-height: 150px; resize: vertical; padding: 12px 13px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface-soft); color: var(--ink); font: inherit; line-height: 1.45; }
-    .chat-compose-row .button { width: 88px; min-width: 88px; min-height: 48px; flex: 0 0 88px; }
-    .chat-compose-note { display: flex; justify-content: space-between; gap: 10px; margin-top: 9px; color: var(--muted); font-size: 11px; line-height: 1.4; }
-    .chat-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .chat-compose { width: 100%; min-width: 0; max-width: 100%; padding: 12px clamp(12px,3vw,24px) 16px; border-top: 1px solid var(--line); background: var(--surface); }
+    .chat-compose-row { display: flex; align-items: flex-end; gap: 8px; padding: 7px; border: 1px solid var(--line); border-radius: 19px; background: var(--surface-soft); box-shadow: 0 4px 18px rgba(30,57,42,.05); }
+    .chat-compose-actions { display: flex; align-items: center; gap: 3px; flex: 0 0 auto; padding-bottom: 1px; }
+    .chat-compose-icon { display: grid; width: 38px; height: 38px; place-items: center; border: 0; border-radius: 13px; background: transparent; color: var(--muted); font-size: 20px; cursor: pointer; }
+    .chat-compose-icon:hover { background: var(--surface); color: var(--ink); }
+    .chat-compose-icon[disabled] { opacity: .45; cursor: not-allowed; }
+    .chat-compose-row textarea { box-sizing: border-box; flex: 1; min-width: 0; min-height: 42px; max-height: 140px; resize: none; padding: 10px 4px; border: 0; outline: 0; background: transparent; color: var(--ink); font: inherit; line-height: 1.45; }
+    .chat-compose-row textarea:focus { outline: 0; }
+    .chat-compose-row .send-button { display: grid; width: 40px; min-width: 40px; height: 40px; min-height: 40px; flex: 0 0 40px; padding: 0; border-radius: 14px; font-size: 20px; }
+    .chat-compose-note { display: flex; justify-content: space-between; gap: 10px; margin: 8px 5px 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
     .chat-api-status { color: var(--muted); font-size: 12px; }
     .chat-attachments { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 10px; }
     .chat-attachment-chip { display: inline-flex; align-items: center; gap: 7px; max-width: 100%; padding: 6px 8px 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-soft); color: var(--muted); font-size: 12px; }
@@ -270,8 +281,7 @@
     .chat-attachment-chip button { width: 21px; height: 21px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
     .chat-file-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
     .chat-file-tag { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 999px; background: var(--green-soft); color: var(--green-dark); font-size: 11px; font-weight: 650; }
-    .chat-upload-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 9px; }
-    .chat-upload-row .button { min-height: 35px; padding: 6px 10px; font-size: 12px; }
+    .chat-upload-row { display: none; }
     .chat-compose-note small { display: block; max-width: 720px; color: var(--muted); font-size: 11px; line-height: 1.4; }
     .file-list { display: grid; gap: 10px; }
     .file-card { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 13px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
@@ -282,7 +292,10 @@
     .file-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
     .file-actions .button { min-height: 34px; padding: 6px 9px; font-size: 12px; }
     .file-disclosure { margin: 14px 0 0; padding: 12px 13px; border-radius: 12px; background: var(--blue-soft); color: var(--muted); font-size: 12px; line-height: 1.5; }
-    :root[data-theme="dark"] .chat-compose-row textarea { background: #15211b; }
+    :root[data-theme="dark"] .chat-compose-row textarea { background: transparent; }
+    #chat-attachments:empty { display: none; }
+    .app-shell.chat-active .topbar-actions > .button,
+    .app-shell.chat-active .site-footer { display: none; }
     :root[data-theme="dark"] .chat-message.assistant { background: var(--surface-soft); }
     .site-footer { display: flex; justify-content: space-between; gap: 14px; padding: 0 clamp(22px, 4vw, 54px) 22px; color: var(--muted); font-size: 12px; }
     .modal-backdrop { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgba(18, 31, 24, .42); }
@@ -388,21 +401,19 @@
       .agenda-panel { min-height: 220px; }
     }
     @media (max-width: 760px) {
-      .app-shell { display: block; padding-bottom: 72px; }
-      .sidebar { position: fixed; z-index: 30; inset: auto 0 0; display: block; width: 100%; height: 64px; padding: 7px 14px calc(7px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); border-right: 0; box-shadow: 0 -8px 24px rgba(29,57,43,.06); }
+      .app-shell { display: block; padding-bottom: 0; }
+      .sidebar { position: fixed; z-index: 35; inset: 0 auto auto 0; display: block; width: 0; height: 0; padding: 0; border: 0; background: transparent; box-shadow: none; }
       .brand, .side-label, .sidebar-spacer, .local-badge { display: none; }
-      .nav-list { position: absolute; inset: auto 12px calc(100% + 9px); display: none; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5px; max-height: min(68vh,520px); overflow-y: auto; padding: 11px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); box-shadow: var(--shadow); }
+      .nav-list { position: fixed; inset: 76px auto auto 14px; display: none; grid-template-columns: minmax(0,1fr); gap: 4px; width: min(260px,calc(100vw - 28px)); max-height: min(68vh,520px); overflow-y: auto; padding: 10px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); box-shadow: var(--shadow); }
       .sidebar.is-open .nav-list { display: grid; }
       .nav-button { min-height: 45px; }
-      .mobile-menu-dock { display: flex; align-items: center; justify-content: space-between; min-height: 46px; }
-      .mobile-menu-button { display: inline-flex; align-items: center; gap: 9px; min-height: 42px; padding: 8px 13px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); font-size: 14px; font-weight: 700; cursor: pointer; }
-      .mobile-menu-glyph { font-size: 18px; line-height: 1; }
-      .mobile-menu-hint { color: var(--muted); font-size: 11px; }
       .topbar { min-height: 66px; padding: 11px 18px; }
-      .mobile-brand { display: flex; align-items: center; gap: 8px; padding: 0; font-size: 14px; font-weight: 750; }
+      .topbar-left { gap: 10px; }
+      .sections-toggle { display: grid; flex: 0 0 auto; width: 40px; height: 40px; place-items: center; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); color: var(--ink); font-size: 20px; cursor: pointer; }
+      .mobile-brand { display: flex; gap: 8px; white-space: nowrap; }
       .mobile-brand .brand-mark { width: 32px; height: 32px; border-radius: 10px; font-size: 15px; }
       .top-caption { display: none; }
-      .topbar-actions .button { min-height: 37px; padding: 7px 10px; font-size: 12px; }
+      .topbar-actions .button { display: none; }
       .avatar { width: 34px; height: 34px; }
       .main-content { padding: 23px 16px 30px; }
       .page-heading { align-items: flex-start; flex-direction: column; margin-bottom: 18px; }
@@ -439,12 +450,15 @@
       .onboarding-card { border-radius: 0; border-left: 0; border-right: 0; }
       .onboarding-points { grid-template-columns: minmax(0,1fr); }
       .api-key-row { align-items: stretch; flex-direction: column; }
-      .chat-shell { height: min(62vh, calc(100vh - 250px)); height: min(62dvh, calc(100dvh - 250px)); min-height: 240px; max-height: calc(100dvh - 210px); }
-      .chat-feed { padding: 15px; }
+      .chat-shell { height: min(68vh, calc(100vh - 205px)); height: min(68dvh, calc(100dvh - 205px)); min-height: 360px; max-height: calc(100dvh - 205px); }
+      .chat-feed { padding: 18px 13px; }
       .chat-message { max-width: 94%; }
-      .chat-compose { padding: 12px; }
+      .chat-compose { padding: 10px 10px calc(12px + env(safe-area-inset-bottom)); }
+      .chat-compose-icon { width: 34px; height: 36px; }
       .chat-compose-note { flex-direction: column; gap: 3px; }
-      .chat-upload-row { gap: 6px; }
+      .chat-suggestions { grid-template-columns: minmax(0,1fr); gap: 8px; margin-top: 20px; }
+      .chat-suggestion { min-height: 50px; }
+      .chat-connect-card { padding: 18px; }
       .file-card { align-items: flex-start; flex-wrap: wrap; }
       .file-actions { width: 100%; justify-content: flex-start; padding-left: 54px; }
     }
@@ -471,7 +485,6 @@
         <button class="nav-button" type="button" data-page="chat"><span class="nav-glyph" aria-hidden="true">✦</span><span>AI Chat</span></button>
         <button class="nav-button" type="button" data-page="progress"><span class="nav-glyph" aria-hidden="true">◔</span><span>Progress</span></button>
       </nav>
-      <div class="mobile-menu-dock"><button class="mobile-menu-button" type="button" data-action="toggle-nav" aria-expanded="false" aria-controls="app-navigation"><span class="mobile-menu-glyph" aria-hidden="true">☰</span><span>Sections</span></button><span class="mobile-menu-hint">Tap a section to switch</span></div>
       <div class="sidebar-spacer"></div>
       <div class="local-badge">
         <span class="local-icon" aria-hidden="true"></span>
@@ -482,7 +495,8 @@
     <div class="workspace">
       <header class="topbar">
         <div class="topbar-left">
-          <button class="mobile-brand" type="button" data-action="toggle-nav" aria-label="Open app sections" aria-expanded="false" aria-controls="app-navigation"><span class="brand-mark" aria-hidden="true">S</span>Semester Sathi</button>
+          <button class="sections-toggle" type="button" data-action="toggle-nav" aria-label="Open app sections" aria-expanded="false" aria-controls="app-navigation"><span aria-hidden="true">☰</span></button>
+          <div class="mobile-brand"><span class="brand-mark" aria-hidden="true">S</span>Semester Sathi</div>
           <span id="top-caption" class="top-caption">Your study workspace</span>
         </div>
         <div class="topbar-actions">
@@ -973,10 +987,12 @@
         return html + '</article>';
       }
       function chatEmptyMarkup() {
-        return '<div class="chat-empty"><div class="chat-empty-mark" aria-hidden="true">✦</div><h2>Your study assistant is ready</h2><p>Ask about a subject, attach an exam timetable or study document, and request a revision plan. Gemini can propose subjects and study tasks for you to review.</p>' + (!apiKey ? '<button class="button button-primary" style="margin:16px auto 0" type="button" data-page="settings">Add API key in Data & settings</button>' : '') + '</div>';
+        if (!apiKey) return '<div class="chat-empty"><section class="chat-connect-card"><div class="chat-empty-mark" aria-hidden="true">✦</div><h2>Connect Gemini to start chatting</h2><p>Save your own Gemini API key from your profile under Data &amp; settings. Your key stays on this device. You can save documents in Files now and attach them when you are ready.</p><button class="button button-primary" type="button" data-page="settings">Open Data &amp; settings</button><a class="api-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get a key from Google AI Studio</a></section></div>';
+        return '<div class="chat-empty"><div class="chat-empty-mark" aria-hidden="true">✦</div><h2>What would you like to study?</h2><p>Ask a question, plan your week, or attach a timetable to get started.</p><div class="chat-suggestions"><button class="chat-suggestion" type="button" data-action="use-chat-prompt" data-prompt="Make a revision plan for my next exam">Make a revision plan for my next exam</button><button class="chat-suggestion" type="button" data-action="use-chat-prompt" data-prompt="Help me decide what to study today">Help me decide what to study today</button><button class="chat-suggestion" type="button" data-action="use-chat-prompt" data-prompt="Read my exam timetable and plan ahead">Read my exam timetable and plan ahead</button><button class="chat-suggestion" type="button" data-action="use-chat-prompt" data-prompt="Help me organize chapters for a subject">Organize chapters for a subject</button></div></div>';
       }
       function chatFeedMarkup() {
         var content = state.chatMessages.length ? state.chatMessages.map(renderChatMessage).join("") : chatEmptyMarkup();
+        if (state.chatMessages.length && !apiKey) content += chatEmptyMarkup();
         if (chatLoading) content += '<article class="chat-message assistant" aria-live="polite"><div class="chat-message-label">Semester Sathi AI</div><div>Thinking…</div></article>';
         return content;
       }
@@ -991,9 +1007,9 @@
       }
       function updateChatBusyUI() {
         var button = document.querySelector("#chat-form button[type='submit']");
-        if (button) { button.disabled = chatLoading || !apiKey; button.textContent = chatLoading ? "Thinking…" : "Send"; button.setAttribute("aria-label", chatLoading ? "Gemini is thinking" : "Send message"); }
-        var status = document.getElementById("chat-api-status");
-        if (status) status.textContent = chatLoading ? "Gemini is replying…" : apiKey ? "Gemini key saved · ready when online" : "Add a Gemini key to start chatting";
+        if (button) { button.disabled = chatLoading || !apiKey; button.textContent = "↑"; button.setAttribute("aria-label", chatLoading ? "Gemini is thinking" : "Send message"); }
+        var input = document.getElementById("chat-input");
+        if (input) input.disabled = !apiKey;
       }
       function chatAttachmentMarkup() {
         var selected = chatAttachmentIds.map(function (id) { return state.files.find(function (file) { return file.id === id; }); }).filter(Boolean);
@@ -1092,11 +1108,10 @@
         return { type: kind, data: await blobToBase64(file.blob), mime_type: mime };
       }
       function renderChatPage() {
-        var top = pageHeading("Chat with your study AI", "Ask for explanations, revision advice, or changes to your study schedule.", '<button class="button button-small" type="button" data-action="clear-chat"' + (state.chatMessages.length ? '' : ' disabled') + '>Clear chat</button>');
-        var status = apiKey ? "Gemini key saved · ready when online" : "Add a Gemini key to start chatting";
+        var top = pageHeading("AI Chat", "Your study companion for subjects, exams, and plans.", state.chatMessages.length ? '<button class="button button-small" type="button" data-action="clear-chat">New chat</button>' : '');
         var feedContent = chatFeedMarkup();
-        var form = '<form id="chat-form" class="chat-compose"><input id="chat-file-input" class="hidden" type="file" multiple accept="' + fileAccept + '"><div id="chat-attachments" class="chat-attachments">' + chatAttachmentMarkup() + '</div><div class="chat-upload-row"><button class="button" type="button" data-action="pick-chat-files">＋ Attach files</button><button class="button" type="button" data-page="files">Browse saved files</button><span class="field-help">PDF, Office, text, images · up to 50 MB each</span></div><div class="chat-compose-row"><textarea id="chat-input" name="message" maxlength="1200" placeholder="Ask about an attached timetable or your subjects…" aria-label="Message Semester Sathi AI"></textarea><button class="button button-primary" type="submit" aria-label="' + (chatLoading ? 'Gemini is thinking' : 'Send message') + '"' + (chatLoading || !apiKey ? ' disabled' : '') + '>' + (chatLoading ? 'Thinking…' : 'Send') + '</button></div><div class="chat-compose-note"><small>' + (apiKey ? 'When you send, your message, study context, and attached files go directly to Google using your key. Local copies remain in Files on this device. Large files may be temporarily stored by Google while being processed.' : 'Save your Google AI Studio key under your profile first. You can still add and save files on this device.') + '</small><span id="chat-api-status" class="chat-api-status" role="status">' + (chatLoading ? 'Gemini is replying…' : status) + '</span></div></form>';
-        return top + '<div class="chat-toolbar"><span class="chat-api-status">' + status + '</span></div><section class="panel chat-shell" aria-label="AI chat"><div id="chat-feed" class="chat-feed" aria-live="polite">' + feedContent + '</div>' + form + '</section>';
+        var form = '<form id="chat-form" class="chat-compose"><input id="chat-file-input" class="hidden" type="file" multiple accept="' + fileAccept + '"><div id="chat-attachments" class="chat-attachments">' + chatAttachmentMarkup() + '</div><div class="chat-compose-row"><div class="chat-compose-actions"><button class="chat-compose-icon" type="button" data-action="pick-chat-files" aria-label="Attach a document" title="Attach a document">＋</button><button class="chat-compose-icon" type="button" data-page="files" aria-label="Browse saved files" title="Browse saved files">▧</button></div><textarea id="chat-input" name="message" maxlength="1200" placeholder="' + (apiKey ? 'Message your study assistant…' : 'Connect Gemini to start chatting') + '" aria-label="Message Semester Sathi AI"' + (apiKey ? '' : ' disabled') + '></textarea><button class="button button-primary send-button" type="submit" aria-label="' + (chatLoading ? 'Gemini is thinking' : 'Send message') + '"' + (chatLoading || !apiKey ? ' disabled' : '') + '>↑</button></div></form>';
+        return top + '<section class="panel chat-shell" aria-label="AI chat conversation"><div id="chat-feed" class="chat-feed" aria-live="polite">' + feedContent + '</div>' + form + '</section>';
       }
       function openOnboarding(editing) {
         var profile = state.profile || {};
@@ -1143,6 +1158,7 @@
         refreshApiStatus();
         var page = pageNames[state.page] ? state.page : "overview";
         state.page = page;
+        document.querySelector(".app-shell").classList.toggle("chat-active", page === "chat");
         document.querySelectorAll("[data-page]").forEach(function (button) {
           if (button.tagName === "BUTTON" && button.classList.contains("nav-button")) {
             button.setAttribute("aria-current", button.dataset.page === page ? "page" : "false");
@@ -1749,7 +1765,7 @@
       }
 
       document.addEventListener("click", function (event) {
-        if (!event.target.closest(".sidebar") && !event.target.closest(".mobile-brand")) setNavOpen(false);
+        if (!event.target.closest(".sidebar") && !event.target.closest(".sections-toggle")) setNavOpen(false);
         if (!event.target.closest(".profile-wrap")) setProfileMenuOpen(false);
         var pageButton = event.target.closest("[data-page]");
         if (pageButton) { setPage(pageButton.dataset.page); return; }
@@ -1778,6 +1794,10 @@
         var name = action.dataset.action;
         if (name === "toggle-nav") setNavOpen(!document.querySelector(".sidebar").classList.contains("is-open"));
         else if (name === "toggle-profile-menu") setProfileMenuOpen(document.getElementById("profile-menu").hidden);
+        else if (name === "use-chat-prompt") {
+          var promptInput = document.getElementById("chat-input");
+          if (promptInput && apiKey) { promptInput.value = action.dataset.prompt || ""; promptInput.focus(); }
+        }
         else if (name === "pick-chat-files") document.getElementById("chat-file-input").click();
         else if (name === "add-library-files") document.getElementById("library-file-input").click();
         else if (name === "attach-library-file") attachLibraryFile(action.dataset.file);
